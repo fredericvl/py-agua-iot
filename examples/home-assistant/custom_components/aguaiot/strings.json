@@ -1,0 +1,22 @@
+{
+  "config": {
+    "flow_title": "Micronova Agua IOT",
+    "step": {
+      "user": {
+        "description": "[%key:common::config_flow::description%]",
+        "data": {
+          "email": "[%key:common::config_flow::data::email%]",
+          "password": "[%key:common::config_flow::data::password%]"
+        }
+      }
+    },
+    "error": {
+      "unauthorized": "[%key:common::config_flow::error::unauthorized%]",
+      "connection_error": "[%key:common::config_flow::error::connection_error%]",
+      "unknown_error": "[%key:common::config_flow::error::unknown_error%]"
+    },
+    "abort": {
+      "device_already_configured": "[%key:common::config_flow::abort::device_already_configured%]"
+    }
+  }
+}
