@@ -70,7 +70,7 @@ class agua_iot(object):
             )
 
         if len(api_url) > 0:
-            self.api_url = api_url
+            self.api_url = api_url.rstrip("/")
         else:
             # Default to Micronova URL if empty API URL string is given
             self.api_url = "https://micronova.agua-iot.com"
