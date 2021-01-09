@@ -12,14 +12,15 @@ from py_agua_iot import (  # pylint: disable=redefined-builtin
 import voluptuous as vol
 
 from homeassistant import config_entries
-from homeassistant.const import (
-    CONF_API_URL,
-    CONF_CUSTOMER_CODE,
-    CONF_EMAIL,
-    CONF_PASSWORD
-)
+from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
 
-from .const import CONF_UUID, DOMAIN
+from .const import (
+    CONF_API_URL,
+    CONF_BRAND_ID,
+    CONF_CUSTOMER_CODE,
+    CONF_UUID,
+    DOMAIN
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -54,13 +55,14 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             api_url = user_input[CONF_API_URL]
             customer_code = user_input[CONF_CUSTOMER_CODE]
+            brand_id = user_input[CONF_BRAND_ID]
 
             if self._entry_in_configuration_exists(user_input):
                 return self.async_abort(reason="device_already_configured")
 
             try:
                 gen_uuid = str(uuid.uuid1())
-                agua_iot(api_url, customer_code, email, password, gen_uuid)
+                agua_iot(api_url, customer_code, email, password, gen_uuid, brand_id=brand_id)
             except UnauthorizedError:
                 errors["base"] = "unauthorized"
             except ConnectionError:
@@ -89,6 +91,9 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         data_schema[
             vol.Required(CONF_CUSTOMER_CODE,
                          default=user_input.get(CONF_CUSTOMER_CODE))
+        ] = str
+        data_schema[
+            vol.Optional(CONF_BRAND_ID, default=1)
         ] = str
         data_schema[
             vol.Required(CONF_EMAIL, default=user_input.get(CONF_EMAIL))

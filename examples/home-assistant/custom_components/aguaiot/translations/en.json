@@ -11,6 +11,9 @@
         "step": {
             "user": {
                 "data": {
+                    "api_url": "Agua IOT URL of brand",
+                    "customer_code": "Customer code of brand",
+                    "brand_id": "Optional brand id",
                     "email": "Email address",
                     "password": "Password"
                 },

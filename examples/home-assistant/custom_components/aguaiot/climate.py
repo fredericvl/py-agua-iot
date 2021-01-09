@@ -32,6 +32,9 @@ from .const import (
     ATTR_HUMAN_DEVICE_STATUS,
     ATTR_REAL_POWER,
     ATTR_SMOKE_TEMP,
+    CONF_API_URL,
+    CONF_BRAND_ID,
+    CONF_CUSTOMER_CODE,
     CONF_UUID,
     DOMAIN,
     AGUA_FAN_1,
@@ -82,12 +85,15 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
 async def async_setup_entry(hass, entry, async_add_entities):
     """Add Agua IOT device entry."""
+    api_url = entry.data[CONF_API_URL]
+    customer_code = entry.data[CONF_CUSTOMER_CODE]
+    brand_id = entry.data[CONF_BRAND_ID]
     email = entry.data[CONF_EMAIL]
     password = entry.data[CONF_PASSWORD]
     gen_uuid = entry.data[CONF_UUID]
 
     try:
-        agua = await hass.async_add_executor_job(agua_iot, email, password, gen_uuid)
+        agua = await hass.async_add_executor_job(agua_iot, api_url, customer_code, email, password, gen_uuid, brand_id)
         device = agua.devices[0]
     except UnauthorizedError:
         _LOGGER.error("Wrong credentials for Agua IOT")
