@@ -560,7 +560,8 @@ class Device(object):
 
     @property
     def set_air_temperature(self):
-        return float(self.__get_information_item('temp_air_set'))
+        numbers = re.compile(r'\d+(?:\.\d+)?')
+        return float(numbers.findall(self.__get_information_item('temp_air_set'))[0])
 
     @set_air_temperature.setter
     def set_air_temperature(self, value):
