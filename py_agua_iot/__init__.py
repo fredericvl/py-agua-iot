@@ -413,16 +413,19 @@ class Device(object):
 
         self.__information_dict = information_dict
 
-    def __get_information_item(self, item):
+    def __get_information_item(self, item, format_string=False):
         formula = self.__register_map_dict[item]['formula']
         formula = formula.replace(
             "#",
             str(self.__information_dict[self.__register_map_dict[item]['offset']])
         )
-        return str.format(
-            self.__register_map_dict[item]['format_string'],
-            eval(formula)
-        )
+        eval_formula = eval(formula)
+        if format_string:
+            return str.format(
+                self.__register_map_dict[item]['format_string'],
+                eval_formula
+            )
+        return eval_formula
 
     def __get_information_item_min(self, item):
         return int(self.__register_map_dict[item]['set_min'])
@@ -447,10 +450,7 @@ class Device(object):
             "#",
             str(value)
         )
-        return [int(float(str.format(
-            self.__register_map_dict[item]['format_string'],
-            eval(formula)
-        )))]
+        return int(eval(formula))
 
     def __request_writing(self, item, values):
         url = (self.__agua_iot.api_url + API_PATH_DEVICE_WRITING)
@@ -555,13 +555,11 @@ class Device(object):
 
     @property
     def air_temperature(self):
-        numbers = re.compile(r'\d+(?:\.\d+)?')
-        return float(numbers.findall(self.__get_information_item('temp_air_get'))[0])
+        return float(self.__get_information_item('temp_air_get'))
 
     @property
     def set_air_temperature(self):
-        numbers = re.compile(r'\d+(?:\.\d+)?')
-        return float(numbers.findall(self.__get_information_item('temp_air_set'))[0])
+        return float(self.__get_information_item('temp_air_set'))
 
     @set_air_temperature.setter
     def set_air_temperature(self, value):
@@ -574,8 +572,7 @@ class Device(object):
 
     @property
     def gas_temperature(self):
-        numbers = re.compile(r'\d+(?:\.\d+)?')
-        return float(numbers.findall(self.__get_information_item('temp_gas_flue_get'))[0])
+        return float(self.__get_information_item('temp_gas_flue_get'))
 
     @property
     def real_power(self):
