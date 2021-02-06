@@ -579,6 +579,14 @@ class Device(object):
         return int(self.__get_information_item('real_power_get'))
 
     @property
+    def min_power(self):
+        return int(self.__get_information_item_min('power_set'))
+
+    @property
+    def max_power(self):
+        return int(self.__get_information_item_max('power_set'))
+
+    @property
     def set_power(self):
         return int(self.__get_information_item('power_set'))
 
