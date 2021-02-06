@@ -37,39 +37,13 @@ from .const import (
     CONF_CUSTOMER_CODE,
     CONF_UUID,
     DOMAIN,
-    AGUA_FAN_1,
-    AGUA_FAN_2,
-    AGUA_FAN_3,
-    AGUA_FAN_4,
-    AGUA_FAN_5,
     AGUA_STATUS_CLEANING,
     AGUA_STATUS_FLAME,
     AGUA_STATUS_OFF,
     AGUA_STATUS_ON,
-    FAN_1,
-    FAN_2,
-    FAN_3,
-    FAN_4,
-    FAN_5,
 )
 
 _LOGGER = logging.getLogger(__name__)
-
-FAN_MODES = [
-    FAN_1,
-    FAN_2,
-    FAN_3,
-    FAN_4,
-    FAN_5,
-]
-
-CURRENT_FAN_MAP_AGUA_HEAT = {
-    AGUA_FAN_1: FAN_1,
-    AGUA_FAN_2: FAN_2,
-    AGUA_FAN_3: FAN_3,
-    AGUA_FAN_4: FAN_4,
-    AGUA_FAN_5: FAN_5,
-}
 
 CURRENT_HVAC_MAP_AGUA_HEAT = {
     AGUA_STATUS_ON: CURRENT_HVAC_HEAT,
@@ -205,13 +179,15 @@ class AguaIOTHeatingDevice(ClimateEntity):
     @property
     def fan_mode(self):
         """Return fan mode."""
-        if self._device.set_power in CURRENT_FAN_MAP_AGUA_HEAT:
-            return CURRENT_FAN_MAP_AGUA_HEAT.get(self._device.set_power)
+        return str(self._device.set_power)
 
     @property
     def fan_modes(self):
         """Return the list of available fan modes."""
-        return FAN_MODES
+        fan_modes = []
+        for x in range(self._device.min_power, (self._device.max_power + 1)):
+            fan_modes.append(str(x))
+        return fan_modes
 
     @property
     def hvac_action(self):
@@ -247,15 +223,11 @@ class AguaIOTHeatingDevice(ClimateEntity):
 
     def set_fan_mode(self, fan_mode):
         """Set new target fan mode."""
-        CURRENT_FAN_MAP_AGUA_HEAT_REVERSE = {
-            v: k for k, v in CURRENT_FAN_MAP_AGUA_HEAT.items()
-        }
-
-        if fan_mode is None or fan_mode not in CURRENT_FAN_MAP_AGUA_HEAT_REVERSE:
+        if fan_mode is None or not fan_mode.isdigit():
             return
 
         try:
-            self._device.set_power = CURRENT_FAN_MAP_AGUA_HEAT_REVERSE.get(fan_mode)
+            self._device.set_power = int(fan_mode)
         except AguaIOTError as err:
             _LOGGER.error("Failed to set fan mode, error: %s", err)
 
