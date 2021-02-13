@@ -358,6 +358,7 @@ class Device(object):
                         register['reg_key']: register_dict
                     })
                 _LOGGER.debug("SUCCESSFULLY UPDATED REGISTERS MAP!")
+                _LOGGER.debug("REGISTERS MAP: %s", str(register_map_dict))
                 self.__register_map_dict = register_map_dict
 
     def __update_device_information(self):
@@ -411,15 +412,21 @@ class Device(object):
 
         _LOGGER.debug("SUCCESSFULLY RETRIEVED ITEM IN JOBANSWERDATA!")
 
+        _LOGGER.debug("INFORMATION MAP: %s", str(information_dict))
+
         self.__information_dict = information_dict
 
     def __get_information_item(self, item, format_string=False):
         formula = self.__register_map_dict[item]['formula']
+        value = str(self.__information_dict[self.__register_map_dict[item]['offset']])
+        _LOGGER.debug("GET '%s' FORMULA: %s", item, formula)
+        _LOGGER.debug("GET '%s' ORIGINAL VALUE: %s", item, value)
         formula = formula.replace(
             "#",
-            str(self.__information_dict[self.__register_map_dict[item]['offset']])
+            value
         )
         eval_formula = eval(formula)
+        _LOGGER.debug("GET '%s' CALCULATED VALUE: %s", item, eval_formula)
         if format_string:
             return str.format(
                 self.__register_map_dict[item]['format_string'],
@@ -428,10 +435,14 @@ class Device(object):
         return eval_formula
 
     def __get_information_item_min(self, item):
-        return int(self.__register_map_dict[item]['set_min'])
+        value = int(self.__register_map_dict[item]['set_min'])
+        _LOGGER.debug("GET '%s' MIN: %s", item, value)
+        return value
 
     def __get_information_item_max(self, item):
-        return int(self.__register_map_dict[item]['set_max'])
+        value = int(self.__register_map_dict[item]['set_max'])
+        _LOGGER.debug("GET '%s' MAX: %s", item, value)
+        return value
 
     def __prepare_value_for_writing(self, item, value):
         value = float(value)
@@ -446,11 +457,15 @@ class Device(object):
             )
 
         formula = self.__register_map_dict[item]['formula_inverse']
+        _LOGGER.debug("SET '%s' FORMULA: %s", item, formula)
+        _LOGGER.debug("SET '%s' ORIGINAL VALUE: %s", item, value)
         formula = formula.replace(
             "#",
             str(value)
         )
-        return int(eval(formula))
+        eval_formula = eval(formula)
+        _LOGGER.debug("SET '%s' CALCULATED VALUE: %s", item, eval_formula)
+        return int(eval_formula)
 
     def __request_writing(self, item, values):
         url = (self.__agua_iot.api_url + API_PATH_DEVICE_WRITING)
