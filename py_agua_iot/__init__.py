@@ -579,7 +579,7 @@ class Device(object):
     @set_air_temperature.setter
     def set_air_temperature(self, value):
         item = 'temp_air_set'
-        values = self.__prepare_value_for_writing(item, value)
+        values = [self.__prepare_value_for_writing(item, value)]
         try:
             self.__request_writing(item, values)
         except Error:
@@ -608,7 +608,7 @@ class Device(object):
     @set_power.setter
     def set_power(self, value):
         item = 'power_set'
-        values = self.__prepare_value_for_writing(item, value)
+        values = [self.__prepare_value_for_writing(item, value)]
         try:
             self.__request_writing(item, values)
         except Error:
