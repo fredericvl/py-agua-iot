@@ -53,6 +53,7 @@ Below you can find a table with the app names of the different stove brands and 
 | Moretti design                | 624813        | https://moretti.agua-iot.com           |
 | Fontana Forni                 | 505912        | https://fontanaforni.agua-iot.com      |
 | MyPiazzetta (MySuperior?)     | 458632        | https://piazzetta.agua-iot.com         |
+| Alfaplam                      | 862148        | https://alfaplam.agua-iot.com          |
 | Nina                          | 999999        | https://micronova.agua-iot.com         |
 | Galletti                      | ?             | ?                                      |
 
