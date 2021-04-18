@@ -163,6 +163,7 @@ class agua_iot(object):
                 'url': API_PATH_LOGIN.lstrip("/")
             }
             headers.update(extra_login_headers)
+            url = self.login_api_url
 
         try:
             response = requests.post(url,
