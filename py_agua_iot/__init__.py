@@ -28,6 +28,7 @@ API_PATH_DEVICE_REGISTERS_MAP = "/deviceGetRegistersMap"
 API_PATH_DEVICE_BUFFER_READING = "/deviceGetBufferReading"
 API_PATH_DEVICE_JOB_STATUS = "/deviceJobStatus/"
 API_PATH_DEVICE_WRITING = "/deviceRequestWriting"
+API_LOGIN_APPLICATION_VERSION = "1.6.0"
 DEFAULT_TIMEOUT_VALUE = 5
 
 HEADER_ACCEPT = (
@@ -52,7 +53,7 @@ class agua_iot(object):
         16: "?", 17: "?", 18: "?", 19: "?"
     }
 
-    def __init__(self, api_url, customer_code, email, password, unique_id, brand_id=1, debug=False):
+    def __init__(self, api_url, customer_code, email, password, unique_id, login_api_url=None, brand_id=1, debug=False):
         """agua_iot object constructor"""
         if debug is True:
             _LOGGER.setLevel(logging.DEBUG)
@@ -80,6 +81,7 @@ class agua_iot(object):
         self.password = password
         self.unique_id = unique_id
         self.brand_id = str(brand_id)
+        self.login_api_url = login_api_url
 
         self.token = None
         self.token_expires = None
@@ -154,6 +156,13 @@ class agua_iot(object):
 
         headers = self._headers()
         headers.update(extra_headers)
+
+        if self.login_api_url is not None:
+            extra_login_headers = {
+                'applicationversion': API_LOGIN_APPLICATION_VERSION,
+                'url': API_PATH_LOGIN.lstrip("/")
+            }
+            headers.update(extra_login_headers)
 
         try:
             response = requests.post(url,
