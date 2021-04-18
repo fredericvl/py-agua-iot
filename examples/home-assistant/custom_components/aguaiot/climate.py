@@ -35,6 +35,7 @@ from .const import (
     CONF_API_URL,
     CONF_BRAND_ID,
     CONF_CUSTOMER_CODE,
+    CONF_LOGIN_API_URL,
     CONF_UUID,
     DOMAIN,
     AGUA_STATUS_CLEANING,
@@ -65,9 +66,10 @@ async def async_setup_entry(hass, entry, async_add_entities):
     email = entry.data[CONF_EMAIL]
     password = entry.data[CONF_PASSWORD]
     gen_uuid = entry.data[CONF_UUID]
+    login_api_url = entry.data[CONF_LOGIN_API_URL]
 
     try:
-        agua = await hass.async_add_executor_job(agua_iot, api_url, customer_code, email, password, gen_uuid, brand_id)
+        agua = await hass.async_add_executor_job(agua_iot, api_url, customer_code, email, password, gen_uuid, brand_id, login_api_url)
         device = agua.devices[0]
     except UnauthorizedError:
         _LOGGER.error("Wrong credentials for Agua IOT")

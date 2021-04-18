@@ -6,6 +6,7 @@
         "description": "[%key:common::config_flow::description%]",
         "data": {
           "api_url": "[%key:common::config_flow::data::api_url%]",
+          "login_api_url": "[%key:common::config_flow::data::login_api_url%]",
           "customer_code": "[%key:common::config_flow::data::customer_code%]",
           "brand_id": "[%key:common::config_flow::data::brand_id%]",
           "email": "[%key:common::config_flow::data::email%]",
