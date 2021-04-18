@@ -11,6 +11,7 @@ ATTR_SMOKE_TEMP = "smoke_temperature"
 CONF_API_URL = "api_url"
 CONF_BRAND_ID = "brand_id"
 CONF_CUSTOMER_CODE = "customer_code"
+CONF_LOGIN_API_URL = "login_api_url"
 CONF_UUID = "uuid"
 
 AGUA_STATUS_CLEANING = "CLEANING FIRE-POT"

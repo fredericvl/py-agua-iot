@@ -18,6 +18,7 @@ from .const import (
     CONF_API_URL,
     CONF_BRAND_ID,
     CONF_CUSTOMER_CODE,
+    CONF_LOGIN_API_URL,
     CONF_UUID,
     DOMAIN
 )
@@ -56,13 +57,14 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             api_url = user_input[CONF_API_URL]
             customer_code = user_input[CONF_CUSTOMER_CODE]
             brand_id = user_input[CONF_BRAND_ID]
+            login_api_url = user_input[CONF_LOGIN_API_URL]
 
             if self._entry_in_configuration_exists(user_input):
                 return self.async_abort(reason="device_already_configured")
 
             try:
                 gen_uuid = str(uuid.uuid1())
-                agua_iot(api_url, customer_code, email, password, gen_uuid, brand_id=brand_id)
+                agua_iot(api_url, customer_code, email, password, gen_uuid, brand_id=brand_id, login_api_url=login_api_url)
             except UnauthorizedError:
                 errors["base"] = "unauthorized"
             except ConnectionError:
@@ -79,7 +81,8 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         CONF_UUID: gen_uuid,
                         CONF_API_URL: api_url,
                         CONF_CUSTOMER_CODE: customer_code,
-                        CONF_BRAND_ID: brand_id
+                        CONF_BRAND_ID: brand_id,
+                        CONF_LOGIN_API_URL: login_api_url
                     },
                 )
         else:
@@ -88,6 +91,9 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         data_schema = OrderedDict()
         data_schema[
             vol.Required(CONF_API_URL, default=user_input.get(CONF_API_URL))
+        ] = str
+        data_schema[
+            vol.Required(CONF_LOGIN_API_URL, default=None)
         ] = str
         data_schema[
             vol.Required(CONF_CUSTOMER_CODE,

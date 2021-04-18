@@ -12,6 +12,7 @@
             "user": {
                 "data": {
                     "api_url": "Agua IOT URL of brand",
+                    "login_api_url": "Separate login API URL (optional, only specify when needed)",
                     "customer_code": "Customer code of brand",
                     "brand_id": "Brand id (by default: 1)",
                     "email": "Email address",
