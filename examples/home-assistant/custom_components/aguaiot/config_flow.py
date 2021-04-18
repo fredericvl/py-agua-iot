@@ -57,7 +57,7 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             api_url = user_input[CONF_API_URL]
             customer_code = user_input[CONF_CUSTOMER_CODE]
             brand_id = user_input[CONF_BRAND_ID]
-            login_api_url = user_input[CONF_LOGIN_API_URL]
+            login_api_url = user_input.get(CONF_LOGIN_API_URL) if user_input.get(CONF_LOGIN_API_URL) != "" else None
 
             if self._entry_in_configuration_exists(user_input):
                 return self.async_abort(reason="device_already_configured")
@@ -93,7 +93,7 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             vol.Required(CONF_API_URL, default=user_input.get(CONF_API_URL))
         ] = str
         data_schema[
-            vol.Required(CONF_LOGIN_API_URL, default=None)
+            vol.Optional(CONF_LOGIN_API_URL, default=user_input.get(CONF_LOGIN_API_URL, ""))
         ] = str
         data_schema[
             vol.Required(CONF_CUSTOMER_CODE,
