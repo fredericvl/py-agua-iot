@@ -64,7 +64,7 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             try:
                 gen_uuid = str(uuid.uuid1())
-                agua_iot(api_url, customer_code, email, password, gen_uuid, brand_id=brand_id, login_api_url=login_api_url)
+                await self.hass.async_add_executor_job(agua_iot, api_url, customer_code, email, password, gen_uuid, login_api_url, brand_id)
             except UnauthorizedError:
                 errors["base"] = "unauthorized"
             except ConnectionError:
