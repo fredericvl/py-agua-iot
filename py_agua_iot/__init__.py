@@ -183,7 +183,7 @@ class agua_iot(object):
         self.token = res['token']
         self.refresh_token = res['refresh_token']
 
-        claimset = jwt.decode(res['token'], verify=False)
+        claimset = jwt.decode(res['token'], options={"verify_signature": False}, algorithms=['none'])
         self.token_expires = claimset.get('exp')
 
         return True
@@ -216,7 +216,7 @@ class agua_iot(object):
         res = response.json()
         self.token = res['token']
 
-        claimset = jwt.decode(res['token'], verify=False)
+        claimset = jwt.decode(res['token'], options={"verify_signature": False}, algorithms=['none']) 
         self.token_expires = claimset.get('exp')
 
         return True
