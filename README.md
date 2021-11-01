@@ -56,6 +56,7 @@ Below you can find a table with the app names of the different stove brands and 
 | MyPiazzetta (MySuperior?)     | 458632        | https://piazzetta.agua-iot.com         | https://piazzetta.iot.web2app.it/api/bridge/endpoint/ |
 | Alfaplam                      | 862148        | https://alfaplam.agua-iot.com          |                                                       |
 | Nina                          | 999999        | https://micronova.agua-iot.com         |                                                       |
+| Nobis                         | 700700        | https://nobis.agua-iot.com             |                                                       |
 | Galletti                      | ?             | ?                                      |                                                       |
 
 If you happen to know any extra or missing customer codes and API URL's, please feel free to open a pull request and add them to the table above.
