@@ -39,6 +39,7 @@ from .const import (
     CONF_UUID,
     DOMAIN,
     AGUA_STATUS_CLEANING,
+    AGUA_STATUS_CLEANING_FINAL,
     AGUA_STATUS_FLAME,
     AGUA_STATUS_OFF,
     AGUA_STATUS_ON,
@@ -48,7 +49,8 @@ _LOGGER = logging.getLogger(__name__)
 
 CURRENT_HVAC_MAP_AGUA_HEAT = {
     AGUA_STATUS_ON: CURRENT_HVAC_HEAT,
-    AGUA_STATUS_CLEANING: CURRENT_HVAC_OFF,
+    AGUA_STATUS_CLEANING: CURRENT_HVAC_HEAT,
+    AGUA_STATUS_CLEANING_FINAL: CURRENT_HVAC_OFF,
     AGUA_STATUS_FLAME: CURRENT_HVAC_HEAT,
     AGUA_STATUS_OFF: CURRENT_HVAC_OFF,
 }
@@ -169,7 +171,7 @@ class AguaIOTHeatingDevice(ClimateEntity):
     @property
     def hvac_mode(self):
         """Return hvac operation ie. heat, cool mode."""
-        if self._device.status != 0:
+        if self._device.status not in [0, 6]:
             return HVAC_MODE_HEAT
         return HVAC_MODE_OFF
 
