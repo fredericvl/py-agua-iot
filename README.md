@@ -61,8 +61,7 @@ Below you can find a table with the app names of the different stove brands and 
 
 If you happen to know any extra or missing customer codes and API URL's, please feel free to open a pull request and add them to the table above.
 
-## Other examples
 
-### Home Assistant
+## Home Assistant
 
-See [examples/home-assistant/README.md](examples/home-assistant/README.md)
+Import this repository into HACS.
