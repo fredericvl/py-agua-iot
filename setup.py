@@ -20,6 +20,6 @@ setuptools.setup(
     ],
     install_requires=[
         "PyJWT==2.1.0",
-        "requests==2.25.1",
+        "requests>=2.25.1",
     ],
 )
