@@ -19,7 +19,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        "PyJWT==2.1.0",
+        "PyJWT>=2.1.0",
         "requests>=2.25.1",
     ],
 )
