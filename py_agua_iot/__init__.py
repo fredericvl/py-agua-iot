@@ -53,7 +53,7 @@ class agua_iot(object):
         16: "?", 17: "?", 18: "?", 19: "?"
     }
 
-    def __init__(self, api_url, customer_code, email, password, unique_id, login_api_url=None, brand_id=1, debug=False):
+    def __init__(self, api_url, customer_code, email, password, unique_id, login_api_url=None, brand_id=1, debug=False, api_login_application_version=API_LOGIN_APPLICATION_VERSION):
         """agua_iot object constructor"""
         if debug is True:
             _LOGGER.setLevel(logging.DEBUG)
@@ -82,6 +82,7 @@ class agua_iot(object):
         self.unique_id = unique_id
         self.brand_id = str(brand_id)
         self.login_api_url = login_api_url
+        self.api_login_application_version = api_login_application_version
 
         self.token = None
         self.token_expires = None
@@ -159,7 +160,7 @@ class agua_iot(object):
 
         if self.login_api_url is not None:
             extra_login_headers = {
-                'applicationversion': API_LOGIN_APPLICATION_VERSION,
+                'applicationversion': self.api_login_application_version,
                 'url': API_PATH_LOGIN.lstrip("/")
             }
             headers.update(extra_login_headers)
