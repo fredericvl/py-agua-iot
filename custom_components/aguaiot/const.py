@@ -10,6 +10,7 @@ ATTR_SMOKE_TEMP = "smoke_temperature"
 
 CONF_API_URL = "api_url"
 CONF_BRAND_ID = "brand_id"
+CONF_API_LOGIN_APPLICATION_VERSION = "api_login_application_version"
 CONF_CUSTOMER_CODE = "customer_code"
 CONF_LOGIN_API_URL = "login_api_url"
 CONF_UUID = "uuid"

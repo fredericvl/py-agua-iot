@@ -17,6 +17,7 @@ from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
 from .const import (
     CONF_API_URL,
     CONF_BRAND_ID,
+    CONF_API_LOGIN_APPLICATION_VERSION,
     CONF_CUSTOMER_CODE,
     CONF_LOGIN_API_URL,
     CONF_UUID,
@@ -58,13 +59,15 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             customer_code = user_input[CONF_CUSTOMER_CODE]
             brand_id = user_input[CONF_BRAND_ID]
             login_api_url = user_input.get(CONF_LOGIN_API_URL) if user_input.get(CONF_LOGIN_API_URL) != "" else None
+            api_login_application_version = user_input.get(CONF_API_LOGIN_APPLICATION_VERSION)
 
             if self._entry_in_configuration_exists(user_input):
                 return self.async_abort(reason="device_already_configured")
 
             try:
                 gen_uuid = str(uuid.uuid1())
-                await self.hass.async_add_executor_job(agua_iot, api_url, customer_code, email, password, gen_uuid, login_api_url, brand_id)
+                debug=False
+                await self.hass.async_add_executor_job(agua_iot, api_url, customer_code, email, password, gen_uuid, login_api_url, brand_id, debug, api_login_application_version)
             except UnauthorizedError:
                 errors["base"] = "unauthorized"
             except ConnectionError:
@@ -82,7 +85,8 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         CONF_API_URL: api_url,
                         CONF_CUSTOMER_CODE: customer_code,
                         CONF_BRAND_ID: brand_id,
-                        CONF_LOGIN_API_URL: login_api_url
+                        CONF_LOGIN_API_URL: login_api_url,
+                        CONF_API_LOGIN_APPLICATION_VERSION: api_login_application_version
                     },
                 )
         else:
@@ -100,7 +104,10 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                          default=user_input.get(CONF_CUSTOMER_CODE))
         ] = str
         data_schema[
-            vol.Required(CONF_BRAND_ID, default=1)
+            vol.Required(CONF_BRAND_ID, default="1")
+        ] = str
+        data_schema[
+            vol.Required(CONF_API_LOGIN_APPLICATION_VERSION, default="1.6.0")
         ] = str
         data_schema[
             vol.Required(CONF_EMAIL, default=user_input.get(CONF_EMAIL))
