@@ -25,39 +25,39 @@ for device in connection.devices:
 
 Below you can find a table with the app names of the different stove brands and their corresponding customer code and API URL.
 
-| App name or Brand             | Customer Code | API URL                                | Separate login URL (only needed if specified)         |
-| ----------------------------- | ------------- | -------------------------------------- | ----------------------------------------------------- |
-| EvaCalòr - PuntoFuoco         | 635987        | https://evastampaggi.agua-iot.com      |                                                       |
-| Elfire Wifi                   | 402762        | https://elfire.agua-iot.com            |                                                       |
-| Karmek Wifi                   | 403873        | https://karmekone.agua-iot.com         |                                                       |
-| Easy Connect                  | 354924        | https://remote.mcz.it                  |                                                       |
-| Easy Connect Plus             | 746318        | https://remote.mcz.it                  |                                                       |
-| Easy Connect Poêle            | 354925        | https://remote.mcz.it                  |                                                       |
-| Lorflam Home                  | 121567        | https://lorflam.agua-iot.com           |                                                       |
-| LMX Remote Control            | 352678        | https://laminox.agua-iot.com           |                                                       |
-| Boreal Home                   | 173118        | https://boreal.agua-iot.com            |                                                       |
-| Bronpi Home                   | 164873        | https://bronpi.agua-iot.com            |                                                       |
-| EOSS WIFI                     | 326495        | https://solartecnik.agua-iot.com       |                                                       |
-| LAMINOXREM REMOTE CONTROL 2.0 | 352678        | https://laminox.agua-iot.com           |                                                       |
-| Jolly Mec Wi Fi               | 732584        | https://jollymec.agua-iot.com          |                                                       |
-| Globe-fire                    | 634876        | https://globefire.agua-iot.com         |                                                       |
-| TS Smart                      | 046629        | https://timsistem.agua-iot.com         |                                                       |
-| Stufe a pellet Italia         | 015142        | https://stufepelletitalia.agua-iot.com |                                                       |
-| My Corisit                    | 101427        | https://mycorisit.agua-iot.com         |                                                       |
-| Fonte Flamme contrôle 1       | 848324        | https://fonteflame.agua-iot.com        |                                                       |
-| Klover Home                   | 143789        | https://klover.agua-iot.com            |                                                       |
-| Nordic Fire 2.0               | 132678        | https://nordicfire.agua-iot.com        |                                                       |
-| GO HEAT                       | 859435        | https://amg.agua-iot.com               |                                                       |
-| Wi-Phire                      | 521228        | https://lineavz.agua-iot.com           |                                                       |
-| Thermoflux                    | 391278        | https://thermoflux.agua-iot.com        |                                                       |
-| Darwin Evolution              | 475219        | https://cola.agua-iot.com              |                                                       |
-| Moretti design                | 624813        | https://moretti.agua-iot.com           |                                                       |
-| Fontana Forni                 | 505912        | https://fontanaforni.agua-iot.com      |                                                       |
-| MyPiazzetta (MySuperior?)     | 458632        | https://piazzetta.agua-iot.com         | https://piazzetta.iot.web2app.it/api/bridge/endpoint/ |
-| Alfaplam                      | 862148        | https://alfaplam.agua-iot.com          |                                                       |
-| Nina                          | 999999        | https://micronova.agua-iot.com         |                                                       |
-| Ravelli Wi-Fi                 | 953712        | https://aico.agua-iot.com              |                                                       |
-| Galletti                      | ?             | ?                                      |                                                       |
+| App name or Brand             | Customer Code | API URL                                | Separate login URL (only needed if specified)           |
+| ----------------------------- | ------------- | -------------------------------------- | ------------------------------------------------------- |
+| EvaCalòr - PuntoFuoco         | 635987        | https://evastampaggi.agua-iot.com      |                                                         |
+| Elfire Wifi                   | 402762        | https://elfire.agua-iot.com            |                                                         |
+| Karmek Wifi                   | 403873        | https://karmekone.agua-iot.com         |                                                         |
+| Easy Connect                  | 354924        | https://remote.mcz.it                  |                                                         |
+| Easy Connect Plus             | 746318        | https://remote.mcz.it                  |                                                         |
+| Easy Connect Poêle            | 354925        | https://remote.mcz.it                  |                                                         |
+| Lorflam Home                  | 121567        | https://lorflam.agua-iot.com           |                                                         |
+| LMX Remote Control            | 352678        | https://laminox.agua-iot.com           |                                                         |
+| Boreal Home                   | 173118        | https://boreal.agua-iot.com            |                                                         |
+| Bronpi Home                   | 164873        | https://bronpi.agua-iot.com            |                                                         |
+| EOSS WIFI                     | 326495        | https://solartecnik.agua-iot.com       |                                                         |
+| LAMINOXREM REMOTE CONTROL 2.0 | 352678        | https://laminox.agua-iot.com           |                                                         |
+| Jolly Mec Wi Fi               | 732584        | https://jollymec.agua-iot.com          |                                                         |
+| Globe-fire                    | 634876        | https://globefire.agua-iot.com         |                                                         |
+| TS Smart                      | 046629        | https://timsistem.agua-iot.com         |                                                         |
+| Stufe a pellet Italia         | 015142        | https://stufepelletitalia.agua-iot.com |                                                         |
+| My Corisit                    | 101427        | https://mycorisit.agua-iot.com         |                                                         |
+| Fonte Flamme contrôle 1       | 848324        | https://fonteflame.agua-iot.com        |                                                         |
+| Klover Home                   | 143789        | https://klover.agua-iot.com            |                                                         |
+| Nordic Fire 2.0               | 132678        | https://nordicfire.agua-iot.com        |                                                         |
+| GO HEAT                       | 859435        | https://amg.agua-iot.com               |                                                         |
+| Wi-Phire                      | 521228        | https://lineavz.agua-iot.com           |                                                         |
+| Thermoflux                    | 391278        | https://thermoflux.agua-iot.com        |                                                         |
+| Darwin Evolution              | 475219        | https://cola.agua-iot.com              |                                                         |
+| Moretti design                | 624813        | https://moretti.agua-iot.com           |                                                         |
+| Fontana Forni                 | 505912        | https://fontanaforni.agua-iot.com      |                                                         |
+| MyPiazzetta (MySuperior?)     | 458632        | https://piazzetta.agua-iot.com         | https://piazzetta-iot.app2cloud.it/api/bridge/endpoint/ |
+| Alfaplam                      | 862148        | https://alfaplam.agua-iot.com          |                                                         |
+| Nina                          | 999999        | https://micronova.agua-iot.com         |                                                         |
+| Ravelli Wi-Fi                 | 953712        | https://aico.agua-iot.com              |                                                         |
+| Galletti                      | ?             | ?                                      |                                                         |
 
 If you happen to know any extra or missing customer codes and API URL's, please feel free to open a pull request and add them to the table above.
 
