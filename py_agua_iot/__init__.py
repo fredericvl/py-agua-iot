@@ -581,7 +581,14 @@ class Device(object):
 
     @property
     def air_temperature(self):
-        return float(self.__get_information_item('temp_air_get'))
+        try:
+            return float(self.__get_information_item('temp_air_get'))
+        except Exception as err:
+            return float(self.__get_information_item('temp_air2_get'))
+
+    @property
+    def air2_temperature(self):
+        return float(self.__get_information_item('temp_air2_get'))
 
     @property
     def set_air_temperature(self):
