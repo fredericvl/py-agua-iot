@@ -63,8 +63,8 @@ Below you can find a table with the app names of the different stove brands and 
 Version info and API documentation could be found at API swagger URL for each brand. Swager is accessible at /api-docs (example: https://nobis.agua-iot.com/api-docs).
 If you happen to know any extra or missing customer codes and API URL's, please feel free to open a pull request and add them to the table above.
 
-## Other examples
+### Other examples
 
-### Home Assistant
+## Home Assistant
 
-See [examples/home-assistant/README.md](examples/home-assistant/README.md)
+Home Assistant plugin using this library: [home_assistant_micronova_agua_iot](https://github.com/vincentwolsink/home_assistant_micronova_agua_iot)
