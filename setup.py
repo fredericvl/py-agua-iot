@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="py-agua-iot",
-    version="0.0.8",
+    version="0.0.11",
     author="Frederic Van Linthoudt",
     author_email="frederic.van.linthoudt@gmail.com",
     description="py-agua-iot provides controlling heating devices connected via the IOT Agua platform of Micronova",
@@ -19,7 +19,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        "PyJWT==2.1.0",
-        "requests==2.25.1",
+        "PyJWT>=2.1.0",
+        "requests>=2.25.1",
     ],
 )

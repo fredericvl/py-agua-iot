@@ -48,12 +48,12 @@ class agua_iot(object):
 
     statusTranslated = {
         0: "OFF", 1: "START", 2: "LOAD PELLETS", 3: "FLAME LIGHT", 4: "ON",
-        5: "CLEANING FIRE-POT", 6: "CLEANING FINAL", 7: "ECO-STOP", 8: "?",
-        9: "NO PELLETS", 10: "?", 11: "?", 12: "?", 13: "?", 14: "?", 15: "?",
+        5: "CLEANING FIRE-POT", 6: "CLEANING FINAL", 7: "ECO-STOP", 8: "PELLETS DEPLETED",
+        9: "IGNITION FAILED", 10: "?", 11: "?", 12: "?", 13: "?", 14: "?", 15: "?",
         16: "?", 17: "?", 18: "?", 19: "?"
     }
 
-    def __init__(self, api_url, customer_code, email, password, unique_id, login_api_url=None, brand_id=1, debug=False):
+    def __init__(self, api_url, customer_code, email, password, unique_id, login_api_url=None, brand_id=1, debug=False, api_login_application_version=API_LOGIN_APPLICATION_VERSION):
         """agua_iot object constructor"""
         if debug is True:
             _LOGGER.setLevel(logging.DEBUG)
@@ -82,6 +82,7 @@ class agua_iot(object):
         self.unique_id = unique_id
         self.brand_id = str(brand_id)
         self.login_api_url = login_api_url
+        self.api_login_application_version = api_login_application_version
 
         self.token = None
         self.token_expires = None
@@ -159,7 +160,7 @@ class agua_iot(object):
 
         if self.login_api_url is not None:
             extra_login_headers = {
-                'applicationversion': API_LOGIN_APPLICATION_VERSION,
+                'applicationversion': self.api_login_application_version,
                 'url': API_PATH_LOGIN.lstrip("/")
             }
             headers.update(extra_login_headers)
@@ -580,7 +581,14 @@ class Device(object):
 
     @property
     def air_temperature(self):
-        return float(self.__get_information_item('temp_air_get'))
+        try:
+            return float(self.__get_information_item('temp_air_get'))
+        except Exception as err:
+            return float(self.__get_information_item('temp_air2_get'))
+
+    @property
+    def air2_temperature(self):
+        return float(self.__get_information_item('temp_air2_get'))
 
     @property
     def set_air_temperature(self):
