@@ -49,8 +49,17 @@ class agua_iot(object):
     statusTranslated = {
         0: "OFF", 1: "START", 2: "LOAD PELLETS", 3: "FLAME LIGHT", 4: "ON",
         5: "CLEANING FIRE-POT", 6: "CLEANING FINAL", 7: "ECO-STOP", 8: "PELLETS DEPLETED",
-        9: "IGNITION FAILED", 10: "?", 11: "?", 12: "?", 13: "?", 14: "?", 15: "?",
+        9: "IGNITION FAILED", 10: "ALARM", 11: "MEM.ALM", 12: "?", 13: "?", 14: "?", 15: "?",
         16: "?", 17: "?", 18: "?", 19: "?"
+    }
+
+    alarmsTranslated = {
+        1: "BLACK OUT", 2:"NO SWITCH ON", 3: "PELLETS FINISHED", 4: "SMOKE TEMPERATURE", 5:"EXTRACTOR ROTATIONS NOT RESPECTED", 
+        6: "FAULTY SMOKE EXTRACTOR", 7: "PELLET LOADING GEARMOTOR ROTATIONS NOT RESPECTED", 8: "PELLET LOADING GEARMOTOR FAULT",
+        9: "PELLET LOADING AUGER BLOCKED", 10: "PELLET LOADING AUGER POWER SUPPLY DEFECT", 11: "MIMIUM MEASURE PASCAL",
+        12: "BRAZIER CLEANER FAULT", 13: "NEGATIVE PRESURE IN CHIMNEY FLUE", 14: "THERMOSTAT MANUAL RESET",
+        15: "FIRE DOOR / ASH PAN OPEN", 16: "PELLET TANK DOOR OPEN", 18: "FLAME PROBE", 22:"FLAME TEMPERATURE",
+        23: "AUGER TRIAC", 24:"AUGER PHASE", 28:"REVOLUTION FAILURE SMOKE ENCODER", 29:"CYCLE LIMIT CLEANING"
     }
 
     def __init__(self, api_url, customer_code, email, password, unique_id, login_api_url=None, brand_id=1, debug=False, api_login_application_version=API_LOGIN_APPLICATION_VERSION):
@@ -570,6 +579,12 @@ class Device(object):
     @property
     def alarms(self):
         return self.__get_information_item('alarms_get')
+    
+    @property
+    def alarms_translated(self):
+        return self.__agua_iot.alarmsTranslated[
+            int(self.__get_information_item('alarms_get'))
+        ]
 
     @property
     def min_temp(self):
