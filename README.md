@@ -48,6 +48,7 @@ Below you can find a table with the app names of the different stove brands and 
 | LAMINOXREM REMOTE CONTROL 2.0 | 352678        | https://laminox.agua-iot.com           | 1.4.4.0     |                                                         |
 | LMX Remote Control            | 352678        | https://laminox.agua-iot.com           | 1.4.4.0     |                                                         |
 | Lorflam Home                  | 121567        | https://lorflam.agua-iot.com           | 2.1.0.0     |                                                         |
+| MCZ                           | ??????        | https://remote.mcz.it                  | 1.5.0.0     |                                                         |
 | Moretti design                | 624813        | https://moretti.agua-iot.com           | 1.4.4.0     |                                                         |
 | My Corisit                    | 101427        | https://mycorisit.agua-iot.com         | 1.4.4.0     |                                                         |
 | MyPiazzetta (MySuperior?)     | 458632        | https://piazzetta.agua-iot.com         | 1.5.0.0     | https://piazzetta-iot.app2cloud.it/api/bridge/endpoint/ |
