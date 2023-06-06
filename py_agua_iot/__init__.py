@@ -620,7 +620,10 @@ class Device(object):
 
     @property
     def gas_temperature(self):
-        return float(self.__get_information_item('temp_gas_flue_get'))
+        try:
+            return float(self.__get_information_item('temp_gas_flue_get'))
+        except Exception as err:
+            return float(self.__get_information_item('temp_probe_k_get'))
 
     @property
     def real_power(self):
