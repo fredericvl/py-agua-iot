@@ -4,6 +4,7 @@ the IOT Agua platform of Micronova
 import jwt
 import json
 import logging
+import formula_parser
 import re
 import requests
 import time
@@ -438,14 +439,14 @@ class Device(object):
 
     def __get_information_item(self, item, format_string=False):
         formula = self.__register_map_dict[item]['formula']
-        value = str(self.__information_dict[self.__register_map_dict[item]['offset']])
+        value = str(self.__information_dict[self.__register_map_dict[item]['offset']] & self.__register_map_dict[item]['mask'])
         _LOGGER.debug("GET '%s' FORMULA: %s", item, formula)
         _LOGGER.debug("GET '%s' ORIGINAL VALUE: %s", item, value)
         formula = formula.replace(
             "#",
             value
         )
-        eval_formula = eval(formula)
+        eval_formula = formula_parser.parser(formula)
         _LOGGER.debug("GET '%s' CALCULATED VALUE: %s", item, eval_formula)
         if format_string:
             return str.format(
@@ -483,7 +484,7 @@ class Device(object):
             "#",
             str(value)
         )
-        eval_formula = eval(formula)
+        eval_formula = formula_parser.parser(formula)
         _LOGGER.debug("SET '%s' CALCULATED VALUE: %s", item, eval_formula)
         return int(eval_formula)
 
