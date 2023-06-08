@@ -438,22 +438,25 @@ class Device(object):
         self.__information_dict = information_dict
 
     def __get_information_item(self, item, format_string=False):
-        formula = self.__register_map_dict[item]['formula']
-        value = str(self.__information_dict[self.__register_map_dict[item]['offset']] & self.__register_map_dict[item]['mask'])
-        _LOGGER.debug("GET '%s' FORMULA: %s", item, formula)
-        _LOGGER.debug("GET '%s' ORIGINAL VALUE: %s", item, value)
-        formula = formula.replace(
-            "#",
-            value
-        )
-        eval_formula = formula_parser.parser(formula)
-        _LOGGER.debug("GET '%s' CALCULATED VALUE: %s", item, eval_formula)
-        if format_string:
-            return str.format(
-                self.__register_map_dict[item]['format_string'],
-                eval_formula
+        try:
+            formula = self.__register_map_dict[item]['formula']
+            value = str(self.__information_dict[self.__register_map_dict[item]['offset']] & self.__register_map_dict[item]['mask'])
+            _LOGGER.debug("GET '%s' FORMULA: %s", item, formula)
+            _LOGGER.debug("GET '%s' ORIGINAL VALUE: %s", item, value)
+            formula = formula.replace(
+                "#",
+                value
             )
-        return eval_formula
+            eval_formula = formula_parser.parser(formula)
+            _LOGGER.debug("GET '%s' CALCULATED VALUE: %s", item, eval_formula)
+            if format_string:
+                return str.format(
+                    self.__register_map_dict[item]['format_string'],
+                    eval_formula
+                )
+            return eval_formula
+        except KeyError:
+            return None
 
     def __get_information_item_min(self, item):
         value = int(self.__register_map_dict[item]['set_min'])
@@ -598,17 +601,27 @@ class Device(object):
     @property
     def air_temperature(self):
         try:
-            return float(self.__get_information_item('temp_air_get'))
-        except Exception as err:
-            return float(self.__get_information_item('temp_air2_get'))
+            air_temp = self.__get_information_item('temp_air_get')
+            if air_temp is None:
+                air_temp = self.__get_information_item('temp_air2_get')
+
+            return float(air_temp)
+        except TypeError:
+            return None
 
     @property
     def air2_temperature(self):
-        return float(self.__get_information_item('temp_air2_get'))
+        try:
+            return float(self.__get_information_item('temp_air2_get'))
+        except TypeError:
+            return None
 
     @property
     def set_air_temperature(self):
-        return float(self.__get_information_item('temp_air_set'))
+        try:
+            return float(self.__get_information_item('temp_air_set'))
+        except TypeError:
+            return None
 
     @set_air_temperature.setter
     def set_air_temperature(self, value):
@@ -620,11 +633,37 @@ class Device(object):
             raise Error("Error while trying to set temperature")
 
     @property
+    def water_temperature(self):
+        try:
+            return float(self.__get_information_item('temp_water_get'))
+        except TypeError:
+            return None
+
+    @property
+    def set_water_temperature(self):
+        try:
+            return float(self.__get_information_item('temp_water_set'))
+        except TypeError:
+            return None
+
+    @set_water_temperature.setter
+    def set_water_temperature(self, value):
+        item = 'temp_water_set'
+        values = [self.__prepare_value_for_writing(item, value)]
+        try:
+            self.__request_writing(item, values)
+        except Error:
+            raise Error("Error while trying to set temperature")
+
+    @property
     def gas_temperature(self):
         try:
-            return float(self.__get_information_item('temp_gas_flue_get'))
-        except Exception as err:
-            return float(self.__get_information_item('temp_probe_k_get'))
+            gas_temp = self.__get_information_item('temp_gas_flue_get')
+            if gas_temp is None:
+                gas_temp = self.__get_information_item('temp_probe_k_get')
+            return float(gas_temp)
+        except TypeError:
+            return None
 
     @property
     def real_power(self):
