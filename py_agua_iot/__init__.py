@@ -32,38 +32,74 @@ API_PATH_DEVICE_WRITING = "/deviceRequestWriting"
 API_LOGIN_APPLICATION_VERSION = "1.6.0"
 DEFAULT_TIMEOUT_VALUE = 5
 
-HEADER_ACCEPT = (
-    "application/json, text/javascript, */*; q=0.01"
-)
-HEADER_CONTENT_TYPE = (
-    "application/json"
-)
-HEADER = {
-    'Accept': HEADER_ACCEPT,
-    'Content-Type': HEADER_CONTENT_TYPE
-}
+HEADER_ACCEPT = "application/json, text/javascript, */*; q=0.01"
+HEADER_CONTENT_TYPE = "application/json"
+HEADER = {"Accept": HEADER_ACCEPT, "Content-Type": HEADER_CONTENT_TYPE}
 
 
 class agua_iot(object):
     """Provides access to Micronova's IOT Agua platform."""
 
     statusTranslated = {
-        0: "OFF", 1: "START", 2: "LOAD PELLETS", 3: "FLAME LIGHT", 4: "ON",
-        5: "CLEANING FIRE-POT", 6: "CLEANING FINAL", 7: "ECO-STOP", 8: "PELLETS DEPLETED",
-        9: "IGNITION FAILED", 10: "ALARM", 11: "MEM.ALM", 12: "?", 13: "?", 14: "?", 15: "?",
-        16: "?", 17: "?", 18: "?", 19: "?"
+        0: "OFF",
+        1: "START",
+        2: "LOAD PELLETS",
+        3: "FLAME LIGHT",
+        4: "ON",
+        5: "CLEANING FIRE-POT",
+        6: "CLEANING FINAL",
+        7: "ECO-STOP",
+        8: "PELLETS DEPLETED",
+        9: "IGNITION FAILED",
+        10: "ALARM",
+        11: "MEM.ALM",
+        12: "?",
+        13: "?",
+        14: "?",
+        15: "?",
+        16: "?",
+        17: "?",
+        18: "?",
+        19: "?",
     }
 
     alarmsTranslated = {
-        1: "BLACK OUT", 2:"NO SWITCH ON", 3: "PELLETS FINISHED", 4: "SMOKE TEMPERATURE", 5:"EXTRACTOR ROTATIONS NOT RESPECTED", 
-        6: "FAULTY SMOKE EXTRACTOR", 7: "PELLET LOADING GEARMOTOR ROTATIONS NOT RESPECTED", 8: "PELLET LOADING GEARMOTOR FAULT",
-        9: "PELLET LOADING AUGER BLOCKED", 10: "PELLET LOADING AUGER POWER SUPPLY DEFECT", 11: "MIMIUM MEASURE PASCAL",
-        12: "BRAZIER CLEANER FAULT", 13: "NEGATIVE PRESURE IN CHIMNEY FLUE", 14: "THERMOSTAT MANUAL RESET",
-        15: "FIRE DOOR / ASH PAN OPEN", 16: "PELLET TANK DOOR OPEN", 18: "FLAME PROBE", 22:"FLAME TEMPERATURE",
-        23: "AUGER TRIAC", 24:"AUGER PHASE", 28:"REVOLUTION FAILURE SMOKE ENCODER", 29:"CYCLE LIMIT CLEANING"
+        1: "BLACK OUT",
+        2: "NO SWITCH ON",
+        3: "PELLETS FINISHED",
+        4: "SMOKE TEMPERATURE",
+        5: "EXTRACTOR ROTATIONS NOT RESPECTED",
+        6: "FAULTY SMOKE EXTRACTOR",
+        7: "PELLET LOADING GEARMOTOR ROTATIONS NOT RESPECTED",
+        8: "PELLET LOADING GEARMOTOR FAULT",
+        9: "PELLET LOADING AUGER BLOCKED",
+        10: "PELLET LOADING AUGER POWER SUPPLY DEFECT",
+        11: "MIMIUM MEASURE PASCAL",
+        12: "BRAZIER CLEANER FAULT",
+        13: "NEGATIVE PRESURE IN CHIMNEY FLUE",
+        14: "THERMOSTAT MANUAL RESET",
+        15: "FIRE DOOR / ASH PAN OPEN",
+        16: "PELLET TANK DOOR OPEN",
+        18: "FLAME PROBE",
+        22: "FLAME TEMPERATURE",
+        23: "AUGER TRIAC",
+        24: "AUGER PHASE",
+        28: "REVOLUTION FAILURE SMOKE ENCODER",
+        29: "CYCLE LIMIT CLEANING",
     }
 
-    def __init__(self, api_url, customer_code, email, password, unique_id, login_api_url=None, brand_id=1, debug=False, api_login_application_version=API_LOGIN_APPLICATION_VERSION):
+    def __init__(
+        self,
+        api_url,
+        customer_code,
+        email,
+        password,
+        unique_id,
+        login_api_url=None,
+        brand_id=1,
+        debug=False,
+        api_login_application_version=API_LOGIN_APPLICATION_VERSION,
+    ):
         """agua_iot object constructor"""
         if debug is True:
             _LOGGER.setLevel(logging.DEBUG)
@@ -111,11 +147,13 @@ class agua_iot(object):
     def _headers(self):
         """Correctly set headers for requests to Agua IOT."""
 
-        return {'Accept': HEADER_ACCEPT,
-                'Content-Type': HEADER_CONTENT_TYPE,
-                'Origin': 'file://',
-                'id_brand': self.brand_id,
-                'customer_code': self.customer_code}
+        return {
+            "Accept": HEADER_ACCEPT,
+            "Content-Type": HEADER_CONTENT_TYPE,
+            "Origin": "file://",
+            "id_brand": self.brand_id,
+            "customer_code": self.customer_code,
+        }
 
     def register_app_id(self):
         """Register app id with Agua IOT"""
@@ -129,23 +167,23 @@ class agua_iot(object):
             "language": "en",
             "id_app": self.unique_id,
             "push_notification_token": self.unique_id,
-            "push_notification_active": False
+            "push_notification_active": False,
         }
         payload = json.dumps(payload)
 
         try:
-            response = requests.post(url,
-                                     data=payload,
-                                     headers=self._headers(),
-                                     allow_redirects=False,
-                                     timeout=DEFAULT_TIMEOUT_VALUE)
-        except (requests.exceptions.ConnectionError,
-                requests.exceptions.Timeout):
-            raise ConnectionError(str.format(
-                "Connection to {0} not possible", url))
+            response = requests.post(
+                url,
+                data=payload,
+                headers=self._headers(),
+                allow_redirects=False,
+                timeout=DEFAULT_TIMEOUT_VALUE,
+            )
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            raise ConnectionError(str.format("Connection to {0} not possible", url))
 
         if response.status_code != 201:
-            raise UnauthorizedError('Failed to register app id')
+            raise UnauthorizedError("Failed to register app id")
 
         return True
 
@@ -154,48 +192,44 @@ class agua_iot(object):
 
         url = self.api_url + API_PATH_LOGIN
 
-        payload = {
-            'email': self.email,
-            'password': self.password
-        }
+        payload = {"email": self.email, "password": self.password}
         payload = json.dumps(payload)
 
-        extra_headers = {
-            'local': 'true',
-            'Authorization': self.unique_id
-        }
+        extra_headers = {"local": "true", "Authorization": self.unique_id}
 
         headers = self._headers()
         headers.update(extra_headers)
 
         if self.login_api_url is not None:
             extra_login_headers = {
-                'applicationversion': self.api_login_application_version,
-                'url': API_PATH_LOGIN.lstrip("/")
+                "applicationversion": self.api_login_application_version,
+                "url": API_PATH_LOGIN.lstrip("/"),
             }
             headers.update(extra_login_headers)
             url = self.login_api_url
 
         try:
-            response = requests.post(url,
-                                     data=payload,
-                                     headers=headers,
-                                     allow_redirects=False,
-                                     timeout=DEFAULT_TIMEOUT_VALUE)
+            response = requests.post(
+                url,
+                data=payload,
+                headers=headers,
+                allow_redirects=False,
+                timeout=DEFAULT_TIMEOUT_VALUE,
+            )
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            raise ConnectionError(str.format(
-                "Connection to {0} not possible", url))
+            raise ConnectionError(str.format("Connection to {0} not possible", url))
 
         if response.status_code != 200:
-            raise UnauthorizedError(
-                'Failed to login, please check credentials')
+            raise UnauthorizedError("Failed to login, please check credentials")
 
         res = response.json()
-        self.token = res['token']
-        self.refresh_token = res['refresh_token']
+        self.token = res["token"]
+        self.refresh_token = res["refresh_token"]
 
-        claimset = jwt.decode(res['token'], options={"verify_signature": False}, algorithms=['none'])
-        self.token_expires = claimset.get('exp')
+        claimset = jwt.decode(
+            res["token"], options={"verify_signature": False}, algorithms=["none"]
+        )
+        self.token_expires = claimset.get("exp")
 
         return True
 
@@ -204,20 +238,19 @@ class agua_iot(object):
 
         url = self.api_url + API_PATH_REFRESH_TOKEN
 
-        payload = {
-            'refresh_token': self.refresh_token
-        }
+        payload = {"refresh_token": self.refresh_token}
         payload = json.dumps(payload)
 
         try:
-            response = requests.post(url,
-                                     data=payload,
-                                     headers=self._headers(),
-                                     allow_redirects=False,
-                                     timeout=DEFAULT_TIMEOUT_VALUE)
+            response = requests.post(
+                url,
+                data=payload,
+                headers=self._headers(),
+                allow_redirects=False,
+                timeout=DEFAULT_TIMEOUT_VALUE,
+            )
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            raise ConnectionError(str.format(
-                "Connection to {0} not possible", url))
+            raise ConnectionError(str.format("Connection to {0} not possible", url))
 
         if response.status_code != 201:
             _LOGGER.warning("Refresh auth token failed, forcing new login...")
@@ -225,16 +258,18 @@ class agua_iot(object):
             return
 
         res = response.json()
-        self.token = res['token']
+        self.token = res["token"]
 
-        claimset = jwt.decode(res['token'], options={"verify_signature": False}, algorithms=['none']) 
-        self.token_expires = claimset.get('exp')
+        claimset = jwt.decode(
+            res["token"], options={"verify_signature": False}, algorithms=["none"]
+        )
+        self.token_expires = claimset.get("exp")
 
         return True
 
     def fetch_devices(self):
         """Fetch heating devices"""
-        url = (self.api_url + API_PATH_DEVICE_LIST)
+        url = self.api_url + API_PATH_DEVICE_LIST
 
         payload = {}
         payload = json.dumps(payload)
@@ -243,13 +278,10 @@ class agua_iot(object):
         if res is False:
             raise Error("Error while fetching devices")
 
-        for dev in res['device']:
-            url = (self.api_url + API_PATH_DEVICE_INFO)
+        for dev in res["device"]:
+            url = self.api_url + API_PATH_DEVICE_INFO
 
-            payload = {
-                'id_device': dev['id_device'],
-                'id_product': dev['id_product']
-            }
+            payload = {"id_device": dev["id_device"], "id_product": dev["id_product"]}
             payload = json.dumps(payload)
 
             res2 = self.handle_webcall("POST", url, payload)
@@ -258,20 +290,20 @@ class agua_iot(object):
 
             self.devices.append(
                 Device(
-                    dev['id'],
-                    dev['id_device'],
-                    dev['id_product'],
-                    dev['product_serial'],
-                    dev['name'],
-                    dev['is_online'],
-                    dev['name_product'],
-                    res2['device_info'][0]['id_registers_map'],
-                    self
+                    dev["id"],
+                    dev["id_device"],
+                    dev["id_product"],
+                    dev["product_serial"],
+                    dev["name"],
+                    dev["is_online"],
+                    dev["name_product"],
+                    res2["device_info"][0]["id_registers_map"],
+                    self,
                 )
             )
 
     def fetch_device_information(self):
-        """Fetch device information of heating devices """
+        """Fetch device information of heating devices"""
         for dev in self.devices:
             dev.update()
 
@@ -279,30 +311,30 @@ class agua_iot(object):
         if time.time() > self.token_expires:
             self.do_refresh_token()
 
-        extra_headers = {
-            'local': 'false',
-            'Authorization': self.token
-        }
+        extra_headers = {"local": "false", "Authorization": self.token}
 
         headers = self._headers()
         headers.update(extra_headers)
 
         try:
             if method == "POST":
-                response = requests.post(url,
-                                         data=payload,
-                                         headers=headers,
-                                         allow_redirects=False,
-                                         timeout=DEFAULT_TIMEOUT_VALUE)
+                response = requests.post(
+                    url,
+                    data=payload,
+                    headers=headers,
+                    allow_redirects=False,
+                    timeout=DEFAULT_TIMEOUT_VALUE,
+                )
             else:
-                response = requests.get(url,
-                                        data=payload,
-                                        headers=headers,
-                                        allow_redirects=False,
-                                        timeout=DEFAULT_TIMEOUT_VALUE)
+                response = requests.get(
+                    url,
+                    data=payload,
+                    headers=headers,
+                    allow_redirects=False,
+                    timeout=DEFAULT_TIMEOUT_VALUE,
+                )
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            raise ConnectionError(str.format(
-                "Connection to {0} not possible", url))
+            raise ConnectionError(str.format("Connection to {0} not possible", url))
 
         if response.status_code == 401:
             self.do_refresh_token()
@@ -316,8 +348,18 @@ class agua_iot(object):
 class Device(object):
     """Agua IOT heating device representation"""
 
-    def __init__(self, id, id_device, id_product, product_serial, name,
-                 is_online, name_product, id_registers_map, agua_iot):
+    def __init__(
+        self,
+        id,
+        id_device,
+        id_product,
+        product_serial,
+        name,
+        is_online,
+        name_product,
+        id_registers_map,
+        agua_iot,
+    ):
         self.__id = id
         self.__id_device = id_device
         self.__id_product = id_product
@@ -336,12 +378,12 @@ class Device(object):
         self.__update_device_information()
 
     def __update_device_registers_mapping(self):
-        url = (self.__agua_iot.api_url + API_PATH_DEVICE_REGISTERS_MAP)
+        url = self.__agua_iot.api_url + API_PATH_DEVICE_REGISTERS_MAP
 
         payload = {
-            'id_device': self.__id_device,
-            'id_product': self.__id_product,
-            'last_update': '2018-06-03T08:59:54.043'
+            "id_device": self.__id_device,
+            "id_product": self.__id_product,
+            "last_update": "2018-06-03T08:59:54.043",
         }
         payload = json.dumps(payload)
 
@@ -350,45 +392,41 @@ class Device(object):
             _LOGGER.debug("GETREGISTERSMAP CALL FAILED!")
             raise Error("Error while fetching registers map")
 
-        for registers_map in res['device_registers_map']['registers_map']:
-            if registers_map['id'] == self.__id_registers_map:
+        for registers_map in res["device_registers_map"]["registers_map"]:
+            if registers_map["id"] == self.__id_registers_map:
                 register_map_dict = dict()
-                for register in registers_map['registers']:
+                for register in registers_map["registers"]:
                     register_dict = dict()
-                    register_dict.update({
-                        'reg_type': register['reg_type'],
-                        'offset': register['offset'],
-                        'formula': register['formula'],
-                        'formula_inverse': register['formula_inverse'],
-                        'format_string': register['format_string'],
-                        'set_min': register['set_min'],
-                        'set_max': register['set_max'],
-                        'mask': register['mask']
-                    })
-                    if 'enc_val' in register:
-                        for v in register['enc_val']:
-                            if v['lang'] == "ENG" and v['description'] == 'ON':
-                                register_dict.update({
-                                    'value_on': v['value']
-                                })
-                            elif v['lang'] == "ENG" and v['description'] == 'OFF':
-                                register_dict.update({
-                                    'value_off': v['value']
-                                })
-                    register_map_dict.update({
-                        register['reg_key']: register_dict
-                    })
+                    register_dict.update(
+                        {
+                            "reg_type": register["reg_type"],
+                            "offset": register["offset"],
+                            "formula": register["formula"],
+                            "formula_inverse": register["formula_inverse"],
+                            "format_string": register["format_string"],
+                            "set_min": register["set_min"],
+                            "set_max": register["set_max"],
+                            "mask": register["mask"],
+                        }
+                    )
+                    if "enc_val" in register:
+                        for v in register["enc_val"]:
+                            if v["lang"] == "ENG" and v["description"] == "ON":
+                                register_dict.update({"value_on": v["value"]})
+                            elif v["lang"] == "ENG" and v["description"] == "OFF":
+                                register_dict.update({"value_off": v["value"]})
+                    register_map_dict.update({register["reg_key"]: register_dict})
                 _LOGGER.debug("SUCCESSFULLY UPDATED REGISTERS MAP!")
                 _LOGGER.debug("REGISTERS MAP: %s", str(register_map_dict))
                 self.__register_map_dict = register_map_dict
 
     def __update_device_information(self):
-        url = (self.__agua_iot.api_url + API_PATH_DEVICE_BUFFER_READING)
+        url = self.__agua_iot.api_url + API_PATH_DEVICE_BUFFER_READING
 
         payload = {
-            'id_device': self.__id_device,
-            'id_product': self.__id_product,
-            'BufferId': 1
+            "id_device": self.__id_device,
+            "id_product": self.__id_product,
+            "BufferId": 1,
         }
         payload = json.dumps(payload)
 
@@ -399,21 +437,23 @@ class Device(object):
 
         _LOGGER.debug("GETBUFFERREADING SUCCEEDED!")
 
-        id_request = res['idRequest']
+        id_request = res["idRequest"]
 
-        url = (self.__agua_iot.api_url + API_PATH_DEVICE_JOB_STATUS + id_request)
+        url = self.__agua_iot.api_url + API_PATH_DEVICE_JOB_STATUS + id_request
 
         payload = {}
         payload = json.dumps(payload)
 
         retry_count = 0
         res = self.__agua_iot.handle_webcall("GET", url, payload)
-        while ((res is False or res['jobAnswerStatus'] != "completed") and retry_count < 10):
+        while (
+            res is False or res["jobAnswerStatus"] != "completed"
+        ) and retry_count < 10:
             time.sleep(1)
             res = self.__agua_iot.handle_webcall("GET", url, payload)
             retry_count = retry_count + 1
 
-        if res is False or res['jobAnswerStatus'] != "completed":
+        if res is False or res["jobAnswerStatus"] != "completed":
             _LOGGER.debug("JOBANSWERSTATUS NOT COMPLETED!")
             raise Error("Error while fetching device information")
 
@@ -422,10 +462,10 @@ class Device(object):
         current_i = 0
         information_dict = dict()
         try:
-            for item in res['jobAnswerData']['Items']:
-                information_dict.update({
-                    item: res['jobAnswerData']['Values'][current_i]
-                })
+            for item in res["jobAnswerData"]["Items"]:
+                information_dict.update(
+                    {item: res["jobAnswerData"]["Values"][current_i]}
+                )
                 current_i = current_i + 1
         except KeyError:
             _LOGGER.debug("NO ITEMS IN JOBANSWERDATA!")
@@ -439,73 +479,67 @@ class Device(object):
 
     def __get_information_item(self, item, format_string=False):
         try:
-            formula = self.__register_map_dict[item]['formula']
-            value = str(self.__information_dict[self.__register_map_dict[item]['offset']] & self.__register_map_dict[item]['mask'])
+            formula = self.__register_map_dict[item]["formula"]
+            value = str(
+                self.__information_dict[self.__register_map_dict[item]["offset"]]
+                & self.__register_map_dict[item]["mask"]
+            )
             _LOGGER.debug("GET '%s' FORMULA: %s", item, formula)
             _LOGGER.debug("GET '%s' ORIGINAL VALUE: %s", item, value)
-            formula = formula.replace(
-                "#",
-                value
-            )
+            formula = formula.replace("#", value)
             eval_formula = formula_parser.parser(formula)
             _LOGGER.debug("GET '%s' CALCULATED VALUE: %s", item, eval_formula)
             if format_string:
                 return str.format(
-                    self.__register_map_dict[item]['format_string'],
-                    eval_formula
+                    self.__register_map_dict[item]["format_string"], eval_formula
                 )
             return eval_formula
         except KeyError:
             return None
 
     def __get_information_item_min(self, item):
-        value = int(self.__register_map_dict[item]['set_min'])
+        value = int(self.__register_map_dict[item]["set_min"])
         _LOGGER.debug("GET '%s' MIN: %s", item, value)
         return value
 
     def __get_information_item_max(self, item):
-        value = int(self.__register_map_dict[item]['set_max'])
+        value = int(self.__register_map_dict[item]["set_max"])
         _LOGGER.debug("GET '%s' MAX: %s", item, value)
         return value
 
     def __prepare_value_for_writing(self, item, value):
         value = float(value)
-        set_min = self.__register_map_dict[item]['set_min']
-        set_max = self.__register_map_dict[item]['set_max']
+        set_min = self.__register_map_dict[item]["set_min"]
+        set_max = self.__register_map_dict[item]["set_max"]
 
         if value < set_min or value > set_max:
             raise ValueError(
-                "Value must be between {0} and {1}".format(
-                    set_min, set_max
-                )
+                "Value must be between {0} and {1}".format(set_min, set_max)
             )
 
-        formula = self.__register_map_dict[item]['formula_inverse']
+        formula = self.__register_map_dict[item]["formula_inverse"]
         _LOGGER.debug("SET '%s' FORMULA: %s", item, formula)
         _LOGGER.debug("SET '%s' ORIGINAL VALUE: %s", item, value)
-        formula = formula.replace(
-            "#",
-            str(value)
-        )
+        formula = formula.replace("#", str(value))
         eval_formula = formula_parser.parser(formula)
         _LOGGER.debug("SET '%s' CALCULATED VALUE: %s", item, eval_formula)
         return int(eval_formula)
 
     def __request_writing(self, item, values):
-        url = (self.__agua_iot.api_url + API_PATH_DEVICE_WRITING)
+        url = self.__agua_iot.api_url + API_PATH_DEVICE_WRITING
 
-        items = [int(self.__register_map_dict[item]['offset'])]
-        masks = [int(self.__register_map_dict[item]['mask'])]
+        items = [int(self.__register_map_dict[item]["offset"])]
+        masks = [int(self.__register_map_dict[item]["mask"])]
 
         payload = {
-            'id_device': self.__id_device,
-            'id_product': self.__id_product,
+            "id_device": self.__id_device,
+            "id_product": self.__id_product,
             "Protocol": "RWMSmaster",
             "BitData": [8],
             "Endianess": ["L"],
             "Items": items,
             "Masks": masks,
-            "Values": values
+            "Values": values,
         }
         payload = json.dumps(payload)
 
@@ -513,21 +547,27 @@ class Device(object):
         if res is False:
             raise Error("Error while request device writing")
 
-        id_request = res['idRequest']
+        id_request = res["idRequest"]
 
-        url = (self.__agua_iot.api_url + API_PATH_DEVICE_JOB_STATUS + id_request)
+        url = self.__agua_iot.api_url + API_PATH_DEVICE_JOB_STATUS + id_request
 
         payload = {}
         payload = json.dumps(payload)
 
         retry_count = 0
         res = self.__agua_iot.handle_webcall("GET", url, payload)
-        while ((res is False or res['jobAnswerStatus'] != "completed") and retry_count < 10):
+        while (
+            res is False or res["jobAnswerStatus"] != "completed"
+        ) and retry_count < 10:
             time.sleep(1)
             res = self.__agua_iot.handle_webcall("GET", url, payload)
             retry_count = retry_count + 1
 
-        if res is False or res['jobAnswerStatus'] != "completed" or 'Cmd' not in res['jobAnswerData']:
+        if (
+            res is False
+            or res["jobAnswerStatus"] != "completed"
+            or "Cmd" not in res["jobAnswerData"]
+        ):
             raise Error("Error while request device writing")
 
     @property
@@ -564,46 +604,46 @@ class Device(object):
 
     @property
     def status_managed(self):
-        return int(self.__get_information_item('status_managed_get'))
+        return int(self.__get_information_item("status_managed_get"))
 
     @property
     def status_managed_enable(self):
-        return int(self.__get_information_item('status_managed_on_enable'))
+        return int(self.__get_information_item("status_managed_on_enable"))
 
     @property
     def status(self):
-        return int(self.__get_information_item('status_get'))
+        return int(self.__get_information_item("status_get"))
 
     @property
     def status_translated(self):
         return self.__agua_iot.statusTranslated[
-            int(self.__get_information_item('status_get'))
+            int(self.__get_information_item("status_get"))
         ]
 
     @property
     def alarms(self):
-        return self.__get_information_item('alarms_get')
-    
+        return self.__get_information_item("alarms_get")
+
     @property
     def alarms_translated(self):
         return self.__agua_iot.alarmsTranslated[
-            int(self.__get_information_item('alarms_get'))
+            int(self.__get_information_item("alarms_get"))
         ]
 
     @property
     def min_temp(self):
-        return self.__get_information_item_min('temp_air_set')
+        return self.__get_information_item_min("temp_air_set")
 
     @property
     def max_temp(self):
-        return self.__get_information_item_max('temp_air_set')
+        return self.__get_information_item_max("temp_air_set")
 
     @property
     def air_temperature(self):
         try:
-            air_temp = self.__get_information_item('temp_air_get')
+            air_temp = self.__get_information_item("temp_air_get")
             if air_temp is None:
-                air_temp = self.__get_information_item('temp_air2_get')
+                air_temp = self.__get_information_item("temp_air2_get")
 
             return float(air_temp)
         except TypeError:
@@ -612,20 +652,20 @@ class Device(object):
     @property
     def air2_temperature(self):
         try:
-            return float(self.__get_information_item('temp_air2_get'))
+            return float(self.__get_information_item("temp_air2_get"))
         except TypeError:
             return None
 
     @property
     def set_air_temperature(self):
         try:
-            return float(self.__get_information_item('temp_air_set'))
+            return float(self.__get_information_item("temp_air_set"))
         except TypeError:
             return None
 
     @set_air_temperature.setter
     def set_air_temperature(self, value):
-        item = 'temp_air_set'
+        item = "temp_air_set"
         values = [self.__prepare_value_for_writing(item, value)]
         try:
             self.__request_writing(item, values)
@@ -635,20 +675,20 @@ class Device(object):
     @property
     def water_temperature(self):
         try:
-            return float(self.__get_information_item('temp_water_get'))
+            return float(self.__get_information_item("temp_water_get"))
         except TypeError:
             return None
 
     @property
     def set_water_temperature(self):
         try:
-            return float(self.__get_information_item('temp_water_set'))
+            return float(self.__get_information_item("temp_water_set"))
         except TypeError:
             return None
 
     @set_water_temperature.setter
     def set_water_temperature(self, value):
-        item = 'temp_water_set'
+        item = "temp_water_set"
         values = [self.__prepare_value_for_writing(item, value)]
         try:
             self.__request_writing(item, values)
@@ -658,32 +698,32 @@ class Device(object):
     @property
     def gas_temperature(self):
         try:
-            gas_temp = self.__get_information_item('temp_gas_flue_get')
+            gas_temp = self.__get_information_item("temp_gas_flue_get")
             if gas_temp is None:
-                gas_temp = self.__get_information_item('temp_probe_k_get')
+                gas_temp = self.__get_information_item("temp_probe_k_get")
             return float(gas_temp)
         except TypeError:
             return None
 
     @property
     def real_power(self):
-        return int(self.__get_information_item('real_power_get'))
+        return int(self.__get_information_item("real_power_get"))
 
     @property
     def min_power(self):
-        return int(self.__get_information_item_min('power_set'))
+        return int(self.__get_information_item_min("power_set"))
 
     @property
     def max_power(self):
-        return int(self.__get_information_item_max('power_set'))
+        return int(self.__get_information_item_max("power_set"))
 
     @property
     def set_power(self):
-        return int(self.__get_information_item('power_set'))
+        return int(self.__get_information_item("power_set"))
 
     @set_power.setter
     def set_power(self, value):
-        item = 'power_set'
+        item = "power_set"
         values = [self.__prepare_value_for_writing(item, value)]
         try:
             self.__request_writing(item, values)
@@ -691,17 +731,16 @@ class Device(object):
             raise Error("Error while trying to set power")
 
     def turn_off(self):
-        item = 'status_managed_get'
-        values = [int(self.__register_map_dict[item]['value_off'])]
+        item = "status_managed_get"
+        values = [int(self.__register_map_dict[item]["value_off"])]
         try:
             self.__request_writing(item, values)
         except Error:
             raise Error("Error while trying to turn off device")
 
     def turn_on(self):
-        item = 'status_managed_get'
-        values = [
-            int(self.__register_map_dict['status_managed_get']['value_on'])]
+        item = "status_managed_get"
+        values = [int(self.__register_map_dict["status_managed_get"]["value_on"])]
         try:
             self.__request_writing(item, values)
         except Error:

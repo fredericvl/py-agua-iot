@@ -1,9 +1,10 @@
 """ Simple formula parser to avoid usage of eval()"""
+
+
 def parser(string):
     string = string.replace(" ", "")
 
     def splitby(string, separators):
-
         lis = []
         current = ""
         for ch in string:
@@ -22,7 +23,7 @@ def parser(string):
         lis = splitby(string, "x*/")
         if len(lis) == 1:
             return lis[0]
-        
+
         output = float(lis[0])
         lis = lis[1:]
 
@@ -34,7 +35,7 @@ def parser(string):
             if operator == "x":
                 output *= number
 
-            elif operator== "*":
+            elif operator == "*":
                 output *= number
 
             elif operator == "/":
@@ -42,7 +43,6 @@ def parser(string):
 
         return output
 
-    
     for i in range(len(lis)):
         lis[i] = evaluate_mul_div(lis[i])
 
