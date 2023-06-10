@@ -4,10 +4,10 @@ the IOT Agua platform of Micronova
 import jwt
 import json
 import logging
-import formula_parser
 import re
 import requests
 import time
+from . import formula_parser
 
 try:
     import http.client as http_client
