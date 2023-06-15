@@ -498,17 +498,23 @@ class Device(object):
             return None
 
     def __get_information_item_min(self, item):
-        value = int(self.__register_map_dict[item]["set_min"])
-        _LOGGER.debug("GET '%s' MIN: %s", item, value)
-        return value
+        try:
+            value = int(self.__register_map_dict[item]["set_min"])
+            _LOGGER.debug("GET '%s' MIN: %s", item, value)
+            return value
+        except (KeyError, ValueError):
+            return None
 
     def __get_information_item_max(self, item):
-        value = int(self.__register_map_dict[item]["set_max"])
-        _LOGGER.debug("GET '%s' MAX: %s", item, value)
-        return value
+        try:
+            value = int(self.__register_map_dict[item]["set_max"])
+            _LOGGER.debug("GET '%s' MAX: %s", item, value)
+            return value
+        except (KeyError, ValueError):
+            return None
 
     def __prepare_value_for_writing(self, item, value):
-        value = float(value)
+        value = int(value)
         set_min = self.__register_map_dict[item]["set_min"]
         set_max = self.__register_map_dict[item]["set_max"]
 
@@ -631,11 +637,11 @@ class Device(object):
         ]
 
     @property
-    def min_temp(self):
+    def min_air_temp(self):
         return self.__get_information_item_min("temp_air_set")
 
     @property
-    def max_temp(self):
+    def max_air_temp(self):
         return self.__get_information_item_max("temp_air_set")
 
     @property
@@ -661,6 +667,14 @@ class Device(object):
             self.__request_writing(item, values)
         except Error:
             raise Error("Error while trying to set temperature")
+
+    @property
+    def min_water_temp(self):
+        return self.__get_information_item_min("temp_water_set")
+
+    @property
+    def max_water_temp(self):
+        return self.__get_information_item_max("temp_water_set")
 
     @property
     def water_temperature(self):
