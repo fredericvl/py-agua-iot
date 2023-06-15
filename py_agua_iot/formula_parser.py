@@ -59,4 +59,4 @@ def parser(string):
         elif operator == "-":
             output -= number
 
-    return output
+    return int(output)
