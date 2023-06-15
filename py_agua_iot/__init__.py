@@ -494,7 +494,7 @@ class Device(object):
                     self.__register_map_dict[item]["format_string"], eval_formula
                 )
             return eval_formula
-        except KeyError:
+        except (KeyError, ValueError):
             return None
 
     def __get_information_item_min(self, item):
@@ -604,20 +604,20 @@ class Device(object):
 
     @property
     def status_managed(self):
-        return int(self.__get_information_item("status_managed_get"))
+        return self.__get_information_item("status_managed_get")
 
     @property
     def status_managed_enable(self):
-        return int(self.__get_information_item("status_managed_on_enable"))
+        return self.__get_information_item("status_managed_on_enable")
 
     @property
     def status(self):
-        return int(self.__get_information_item("status_get"))
+        return self.__get_information_item("status_get")
 
     @property
     def status_translated(self):
         return self.__agua_iot.statusTranslated[
-            int(self.__get_information_item("status_get"))
+            self.__get_information_item("status_get")
         ]
 
     @property
@@ -627,7 +627,7 @@ class Device(object):
     @property
     def alarms_translated(self):
         return self.__agua_iot.alarmsTranslated[
-            int(self.__get_information_item("alarms_get"))
+            self.__get_information_item("alarms_get")
         ]
 
     @property
@@ -640,28 +640,18 @@ class Device(object):
 
     @property
     def air_temperature(self):
-        try:
-            air_temp = self.__get_information_item("temp_air_get")
-            if air_temp is None:
-                air_temp = self.__get_information_item("temp_air2_get")
-
-            return float(air_temp)
-        except TypeError:
-            return None
+        air_temp = self.__get_information_item("temp_air_get")
+        if air_temp is None:
+            air_temp = self.__get_information_item("temp_air2_get")
+        return air_temp
 
     @property
     def air2_temperature(self):
-        try:
-            return float(self.__get_information_item("temp_air2_get"))
-        except TypeError:
-            return None
+        return self.__get_information_item("temp_air2_get")
 
     @property
     def set_air_temperature(self):
-        try:
-            return float(self.__get_information_item("temp_air_set"))
-        except TypeError:
-            return None
+        return self.__get_information_item("temp_air_set")
 
     @set_air_temperature.setter
     def set_air_temperature(self, value):
@@ -674,17 +664,11 @@ class Device(object):
 
     @property
     def water_temperature(self):
-        try:
-            return float(self.__get_information_item("temp_water_get"))
-        except TypeError:
-            return None
+        return self.__get_information_item("temp_water_get")
 
     @property
     def set_water_temperature(self):
-        try:
-            return float(self.__get_information_item("temp_water_set"))
-        except TypeError:
-            return None
+        return self.__get_information_item("temp_water_set")
 
     @set_water_temperature.setter
     def set_water_temperature(self, value):
@@ -697,29 +681,26 @@ class Device(object):
 
     @property
     def gas_temperature(self):
-        try:
-            gas_temp = self.__get_information_item("temp_gas_flue_get")
-            if gas_temp is None:
-                gas_temp = self.__get_information_item("temp_probe_k_get")
-            return float(gas_temp)
-        except TypeError:
-            return None
+        gas_temp = self.__get_information_item("temp_gas_flue_get")
+        if gas_temp is None:
+            gas_temp = self.__get_information_item("temp_probe_k_get")
+        return gas_temp
 
     @property
     def real_power(self):
-        return int(self.__get_information_item("real_power_get"))
+        return self.__get_information_item("real_power_get")
 
     @property
     def min_power(self):
-        return int(self.__get_information_item_min("power_set"))
+        return self.__get_information_item_min("power_set")
 
     @property
     def max_power(self):
-        return int(self.__get_information_item_max("power_set"))
+        return self.__get_information_item_max("power_set")
 
     @property
     def set_power(self):
-        return int(self.__get_information_item("power_set"))
+        return self.__get_information_item("power_set")
 
     @set_power.setter
     def set_power(self, value):
