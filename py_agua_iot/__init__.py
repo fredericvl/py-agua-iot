@@ -741,6 +741,17 @@ class Device(object):
         except Error:
             raise Error("Error while trying to turn on device")
 
+    @property
+    def full_data_map(self):
+        data_map = {}
+        for key, value in self.__register_map_dict.items():
+            value["raw_value"] = self.__information_dict[value["offset"]]
+            value["calculated_value"] = self.__get_information_item(key)
+            value["formatted_value"] = self.__get_information_item(key, True)
+            data_map[key] = value
+
+        return data_map
+
 
 class Error(Exception):
     """Exception type for Agua IOT"""
