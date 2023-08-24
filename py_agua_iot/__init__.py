@@ -477,7 +477,7 @@ class Device(object):
 
         self.__information_dict = information_dict
 
-    def __get_information_item(self, item, format_string=False):
+    def __get_item_value(self, item, format_string=False):
         try:
             formula = self.__register_map_dict[item]["formula"]
             value = str(
@@ -497,7 +497,7 @@ class Device(object):
         except (KeyError, ValueError):
             return None
 
-    def __get_information_item_min(self, item):
+    def __get_item_min(self, item):
         try:
             value = int(self.__register_map_dict[item]["set_min"])
             _LOGGER.debug("GET '%s' MIN: %s", item, value)
@@ -505,13 +505,44 @@ class Device(object):
         except (KeyError, ValueError):
             return None
 
-    def __get_information_item_max(self, item):
+    def __get_item_max(self, item):
         try:
             value = int(self.__register_map_dict[item]["set_max"])
             _LOGGER.debug("GET '%s' MAX: %s", item, value)
             return value
         except (KeyError, ValueError):
             return None
+
+    def __get_item_value_on(self, item):
+        try:
+            value = int(self.__register_map_dict[item]["value_on"])
+            _LOGGER.debug("GET '%s' VALUE ON: %s", item, value)
+            return value
+        except (KeyError, ValueError):
+            return None
+
+    def __get_item_value_off(self, item):
+        try:
+            value = int(self.__register_map_dict[item]["value_off"])
+            _LOGGER.debug("GET '%s' VALUE OFF: %s", item, value)
+            return value
+        except (KeyError, ValueError):
+            return None
+
+    def __get_item_boolean(self, item):
+        item_value = self.__get_item_value(item)
+        if item_value is None:
+            return
+
+        value_on = self.__get_item_value_on(item)
+        value_off = self.__get_item_value_off(item)
+
+        if item_value == value_on:
+            return True
+        elif item_value == value_off:
+            return False
+        else:
+            raise ValueError(f"Not a boolean type: {item}")
 
     def __prepare_value_for_writing(self, item, value):
         value = int(value)
@@ -576,6 +607,26 @@ class Device(object):
         ):
             raise Error("Error while request device writing")
 
+    def __set_item_value(self, item, value):
+        values = [self.__prepare_value_for_writing(item, value)]
+        try:
+            self.__request_writing(item, values)
+        except Error:
+            raise Error(f"Error while trying to set: {item}")
+
+    def __set_item_boolean(self, item, value):
+        value_on = self.__get_item_value_on(item)
+        value_off = self.__get_item_value_off(item)
+        if value_on is None or value_off is None:
+            raise ValueError(f"Not a boolean type: {item}")
+
+        if boolean == True:
+            self.__set_item_value(item, value_on)
+        elif boolean == False:
+            self.__set_item_value(item, value_off)
+        else:
+            raise ValueError(f"Expected boolean: {item}, value: {value}")
+
     @property
     def id(self):
         return self.__id
@@ -610,120 +661,160 @@ class Device(object):
 
     @property
     def status_managed(self):
-        return self.__get_information_item("status_managed_get")
+        return self.__get_item_value("status_managed_get")
 
     @property
     def status_managed_enable(self):
-        return self.__get_information_item("status_managed_on_enable")
+        return self.__get_item_value("status_managed_on_enable")
 
     @property
     def status(self):
-        return self.__get_information_item("status_get")
+        return self.__get_item_value("status_get")
 
     @property
     def status_translated(self):
-        return self.__agua_iot.statusTranslated[
-            self.__get_information_item("status_get")
-        ]
+        return self.__agua_iot.statusTranslated[self.__get_item_value("status_get")]
 
     @property
     def alarms(self):
-        return self.__get_information_item("alarms_get")
+        return self.__get_item_value("alarms_get")
 
     @property
     def alarms_translated(self):
-        return self.__agua_iot.alarmsTranslated[
-            self.__get_information_item("alarms_get")
-        ]
+        return self.__agua_iot.alarmsTranslated[self.__get_item_value("alarms_get")]
 
     @property
     def min_air_temp(self):
-        return self.__get_information_item_min("temp_air_set")
+        return self.__get_item_min("temp_air_set")
 
     @property
     def max_air_temp(self):
-        return self.__get_information_item_max("temp_air_set")
+        return self.__get_item_max("temp_air_set")
 
     @property
-    def air_temperature(self):
-        air_temp = self.__get_information_item("temp_air_get")
+    def max_air_temp(self):
+        return self.__get_item_max("temp_air_set")
+
+    @property
+    def air_temp(self):
+        air_temp = self.__get_item_value("temp_air_get")
         if air_temp is None:
-            air_temp = self.__get_information_item("temp_air2_get")
+            air_temp = self.__get_item_value("temp_air2_get")
         return air_temp
 
-    @property
-    def air2_temperature(self):
-        return self.__get_information_item("temp_air2_get")
+    # Backwards compatibility
+    air_temperature = air_temp
 
     @property
-    def set_air_temperature(self):
-        return self.__get_information_item("temp_air_set")
+    def air2_temp(self):
+        return self.__get_item_value("temp_air2_get")
 
-    @set_air_temperature.setter
-    def set_air_temperature(self, value):
-        item = "temp_air_set"
-        values = [self.__prepare_value_for_writing(item, value)]
-        try:
-            self.__request_writing(item, values)
-        except Error:
-            raise Error("Error while trying to set temperature")
+    @property
+    def set_air_temp(self):
+        return self.__get_item_value("temp_air_set")
+
+    @set_air_temp.setter
+    def set_air_temp(self, value):
+        self.__set_item_value("temp_air_set", value)
+
+    # Backwards compatibility
+    set_air_temperature = air_temp
 
     @property
     def min_water_temp(self):
-        return self.__get_information_item_min("temp_water_set")
+        return self.__get_item_min("temp_water_set")
 
     @property
     def max_water_temp(self):
-        return self.__get_information_item_max("temp_water_set")
+        return self.__get_item_max("temp_water_set")
 
     @property
-    def water_temperature(self):
-        return self.__get_information_item("temp_water_get")
+    def water_temp(self):
+        return self.__get_item_value("temp_water_get")
+
+    # Backwards compatibility
+    water_temperature = water_temp
 
     @property
-    def set_water_temperature(self):
-        return self.__get_information_item("temp_water_set")
+    def set_water_temp(self):
+        return self.__get_item_value("temp_water_set")
 
-    @set_water_temperature.setter
-    def set_water_temperature(self, value):
-        item = "temp_water_set"
-        values = [self.__prepare_value_for_writing(item, value)]
-        try:
-            self.__request_writing(item, values)
-        except Error:
-            raise Error("Error while trying to set temperature")
+    @set_water_temp.setter
+    def set_water_temp(self, value):
+        self.__set_item_value("temp_water_set", value)
+
+    # Backwards compatibility
+    set_water_temperature = set_water_temp
 
     @property
-    def gas_temperature(self):
-        gas_temp = self.__get_information_item("temp_gas_flue_get")
+    def gas_temp(self):
+        gas_temp = self.__get_item_value("temp_gas_flue_get")
         if gas_temp is None:
-            gas_temp = self.__get_information_item("temp_probe_k_get")
+            gas_temp = self.__get_item_value("temp_probe_k_get")
         return gas_temp
+
+    # Backwards compatibility
+    gas_temperature = gas_temp
+
+    @property
+    def natural_mode(self):
+        return self.__get_item_boolean("natural_mode_manual_set")
+
+    @natural_mode.setter
+    def natural_mode(self, value):
+        self.__set_item_boolean("natural_mode_manual_set", value)
+
+    @property
+    def energy_saving_air_start(self):
+        return self.__get_item_value("es_air_start_set")
+
+    @energy_saving_air_start.setter
+    def energy_saving_air_start(self, value):
+        self.__set_item_value("es_air_start_set", value)
+
+    @property
+    def min_energy_saving_air_start(self):
+        return self.__get_item_min("es_air_start_set")
+
+    @property
+    def max_energy_saving_air_start(self):
+        return self.__get_item_max("es_air_start_set")
+
+    @property
+    def energy_saving_air_stop(self):
+        return self.__get_item_value("es_air_stop_set")
+
+    @property
+    def min_energy_saving_air_stop(self):
+        return self.__get_item_min("es_air_stop_set")
+
+    @property
+    def max_energy_saving_air_stop(self):
+        return self.__get_item_max("es_air_stop_set")
+
+    @energy_saving_air_stop.setter
+    def energy_saving_air_stop(self, value):
+        self.__set_item_value("es_air_stop_set", value)
 
     @property
     def real_power(self):
-        return self.__get_information_item("real_power_get")
+        return self.__get_item_value("real_power_get")
 
     @property
     def min_power(self):
-        return self.__get_information_item_min("power_set")
+        return self.__get_item_min("power_set")
 
     @property
     def max_power(self):
-        return self.__get_information_item_max("power_set")
+        return self.__get_item_max("power_set")
 
     @property
     def set_power(self):
-        return self.__get_information_item("power_set")
+        return self.__get_item_value("power_set")
 
     @set_power.setter
     def set_power(self, value):
-        item = "power_set"
-        values = [self.__prepare_value_for_writing(item, value)]
-        try:
-            self.__request_writing(item, values)
-        except Error:
-            raise Error("Error while trying to set power")
+        self.__set_item_value("power_set", value)
 
     def turn_off(self):
         item = "status_managed_get"
@@ -746,8 +837,8 @@ class Device(object):
         data_map = {}
         for key, value in self.__register_map_dict.items():
             value["raw_value"] = self.__information_dict[value["offset"]]
-            value["calculated_value"] = self.__get_information_item(key)
-            value["formatted_value"] = self.__get_information_item(key, True)
+            value["calculated_value"] = self.__get_item_value(key)
+            value["formatted_value"] = self.__get_item_value(key, True)
             data_map[key] = value
 
         return data_map
