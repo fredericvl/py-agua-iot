@@ -620,9 +620,9 @@ class Device(object):
         if value_on is None or value_off is None:
             raise ValueError(f"Not a boolean type: {item}")
 
-        if boolean == True:
+        if value == True:
             self.__set_item_value(item, value_on)
-        elif boolean == False:
+        elif value == False:
             self.__set_item_value(item, value_off)
         else:
             raise ValueError(f"Expected boolean: {item}, value: {value}")
