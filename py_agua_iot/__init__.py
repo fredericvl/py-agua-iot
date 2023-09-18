@@ -7,6 +7,7 @@ import logging
 import re
 import requests
 import time
+import re
 from . import formula_parser
 
 try:
@@ -360,29 +361,31 @@ class Device(object):
         id_registers_map,
         agua_iot,
     ):
-        self.__id = id
-        self.__id_device = id_device
-        self.__id_product = id_product
-        self.__product_serial = product_serial
-        self.__name = name
-        self.__is_online = is_online
-        self.__name_product = name_product
-        self.__id_registers_map = id_registers_map
+        self.id = id
+        self.id_device = id_device
+        self.id_product = id_product
+        self.product_serial = product_serial
+        self.name = name
+        self.is_online = is_online
+        self.name_product = name_product
+        self.id_registers_map = id_registers_map
         self.__agua_iot = agua_iot
         self.__register_map_dict = dict()
         self.__information_dict = dict()
+        self.__canalization = dict()
 
     def update(self):
         """Update device information"""
         self.__update_device_registers_mapping()
         self.__update_device_information()
+        self.__update_childs()
 
     def __update_device_registers_mapping(self):
         url = self.__agua_iot.api_url + API_PATH_DEVICE_REGISTERS_MAP
 
         payload = {
-            "id_device": self.__id_device,
-            "id_product": self.__id_product,
+            "id_device": self.id_device,
+            "id_product": self.id_product,
             "last_update": "2018-06-03T08:59:54.043",
         }
         payload = json.dumps(payload)
@@ -393,7 +396,7 @@ class Device(object):
             raise Error("Error while fetching registers map")
 
         for registers_map in res["device_registers_map"]["registers_map"]:
-            if registers_map["id"] == self.__id_registers_map:
+            if registers_map["id"] == self.id_registers_map:
                 register_map_dict = dict()
                 for register in registers_map["registers"]:
                     register_dict = dict()
@@ -424,8 +427,8 @@ class Device(object):
         url = self.__agua_iot.api_url + API_PATH_DEVICE_BUFFER_READING
 
         payload = {
-            "id_device": self.__id_device,
-            "id_product": self.__id_product,
+            "id_device": self.id_device,
+            "id_product": self.id_product,
             "BufferId": 1,
         }
         payload = json.dumps(payload)
@@ -477,7 +480,21 @@ class Device(object):
 
         self.__information_dict = information_dict
 
-    def __get_item_value(self, item, format_string=False):
+    def __update_childs(self):
+        for canal in list(
+            set(
+                [
+                    m.group(1)
+                    for i in self.__register_map_dict.keys()
+                    for m in [re.match(r"^(canalization_\d+)_", i.lower())]
+                    if m
+                ]
+            )
+        ):
+            if canal not in self.__canalization:
+                self.__canalization[canal] = Canalization(canal, self)
+
+    def get_item_value(self, item, format_string=False):
         try:
             formula = self.__register_map_dict[item]["formula"]
             value = str(
@@ -497,7 +514,7 @@ class Device(object):
         except (KeyError, ValueError):
             return None
 
-    def __get_item_min(self, item):
+    def get_item_min(self, item):
         try:
             value = int(self.__register_map_dict[item]["set_min"])
             _LOGGER.debug("GET '%s' MIN: %s", item, value)
@@ -505,7 +522,7 @@ class Device(object):
         except (KeyError, ValueError):
             return None
 
-    def __get_item_max(self, item):
+    def get_item_max(self, item):
         try:
             value = int(self.__register_map_dict[item]["set_max"])
             _LOGGER.debug("GET '%s' MAX: %s", item, value)
@@ -513,7 +530,7 @@ class Device(object):
         except (KeyError, ValueError):
             return None
 
-    def __get_item_value_on(self, item):
+    def get_item_value_on(self, item):
         try:
             value = int(self.__register_map_dict[item]["value_on"])
             _LOGGER.debug("GET '%s' VALUE ON: %s", item, value)
@@ -521,7 +538,7 @@ class Device(object):
         except (KeyError, ValueError):
             return None
 
-    def __get_item_value_off(self, item):
+    def get_item_value_off(self, item):
         try:
             value = int(self.__register_map_dict[item]["value_off"])
             _LOGGER.debug("GET '%s' VALUE OFF: %s", item, value)
@@ -529,13 +546,13 @@ class Device(object):
         except (KeyError, ValueError):
             return None
 
-    def __get_item_boolean(self, item):
-        item_value = self.__get_item_value(item)
+    def get_item_boolean(self, item):
+        item_value = self.get_item_value(item)
         if item_value is None:
             return
 
-        value_on = self.__get_item_value_on(item)
-        value_off = self.__get_item_value_off(item)
+        value_on = self.get_item_value_on(item)
+        value_off = self.get_item_value_off(item)
 
         if item_value == value_on:
             return True
@@ -569,8 +586,8 @@ class Device(object):
         masks = [int(self.__register_map_dict[item]["mask"])]
 
         payload = {
-            "id_device": self.__id_device,
-            "id_product": self.__id_product,
+            "id_device": self.id_device,
+            "id_product": self.id_product,
             "Protocol": "RWMSmaster",
             "BitData": [8],
             "Endianess": ["L"],
@@ -607,99 +624,67 @@ class Device(object):
         ):
             raise Error("Error while request device writing")
 
-    def __set_item_value(self, item, value):
+    def set_item_value(self, item, value):
         values = [self.__prepare_value_for_writing(item, value)]
         try:
             self.__request_writing(item, values)
         except Error:
             raise Error(f"Error while trying to set: {item}")
 
-    def __set_item_boolean(self, item, value):
-        value_on = self.__get_item_value_on(item)
-        value_off = self.__get_item_value_off(item)
+    def set_item_boolean(self, item, value):
+        value_on = self.get_item_value_on(item)
+        value_off = self.get_item_value_off(item)
         if value_on is None or value_off is None:
             raise ValueError(f"Not a boolean type: {item}")
 
         if value == True:
-            self.__set_item_value(item, value_on)
+            self.set_item_value(item, value_on)
         elif value == False:
-            self.__set_item_value(item, value_off)
+            self.set_item_value(item, value_off)
         else:
             raise ValueError(f"Expected boolean: {item}, value: {value}")
 
     @property
-    def id(self):
-        return self.__id
-
-    @property
-    def id_device(self):
-        return self.__id_device
-
-    @property
-    def id_product(self):
-        return self.__id_product
-
-    @property
-    def product_serial(self):
-        return self.__product_serial
-
-    @property
-    def name(self):
-        return self.__name
-
-    @property
-    def is_online(self):
-        return self.__is_online
-
-    @property
-    def name_product(self):
-        return self.__name_product
-
-    @property
-    def id_registers_map(self):
-        return self.__id_registers_map
+    def canalization(self):
+        return self.__canalization.values()
 
     @property
     def status_managed(self):
-        return self.__get_item_value("status_managed_get")
+        return self.get_item_value("status_managed_get")
 
     @property
     def status_managed_enable(self):
-        return self.__get_item_value("status_managed_on_enable")
+        return self.get_item_value("status_managed_on_enable")
 
     @property
     def status(self):
-        return self.__get_item_value("status_get")
+        return self.get_item_value("status_get")
 
     @property
     def status_translated(self):
-        return self.__agua_iot.statusTranslated[self.__get_item_value("status_get")]
+        return self.__agua_iot.statusTranslated[self.get_item_value("status_get")]
 
     @property
     def alarms(self):
-        return self.__get_item_value("alarms_get")
+        return self.get_item_value("alarms_get")
 
     @property
     def alarms_translated(self):
-        return self.__agua_iot.alarmsTranslated[self.__get_item_value("alarms_get")]
+        return self.__agua_iot.alarmsTranslated[self.get_item_value("alarms_get")]
 
     @property
     def min_air_temp(self):
-        return self.__get_item_min("temp_air_set")
+        return self.get_item_min("temp_air_set")
 
     @property
     def max_air_temp(self):
-        return self.__get_item_max("temp_air_set")
-
-    @property
-    def max_air_temp(self):
-        return self.__get_item_max("temp_air_set")
+        return self.get_item_max("temp_air_set")
 
     @property
     def air_temp(self):
-        air_temp = self.__get_item_value("temp_air_get")
+        air_temp = self.get_item_value("temp_air_get")
         if air_temp is None:
-            air_temp = self.__get_item_value("temp_air2_get")
+            air_temp = self.get_item_value("temp_air2_get")
         return air_temp
 
     # Backwards compatibility
@@ -707,50 +692,50 @@ class Device(object):
 
     @property
     def air2_temp(self):
-        return self.__get_item_value("temp_air2_get")
+        return self.get_item_value("temp_air2_get")
 
     @property
     def set_air_temp(self):
-        return self.__get_item_value("temp_air_set")
+        return self.get_item_value("temp_air_set")
 
     @set_air_temp.setter
     def set_air_temp(self, value):
-        self.__set_item_value("temp_air_set", value)
+        self.set_item_value("temp_air_set", value)
 
     # Backwards compatibility
     set_air_temperature = air_temp
 
     @property
     def min_water_temp(self):
-        return self.__get_item_min("temp_water_set")
+        return self.get_item_min("temp_water_set")
 
     @property
     def max_water_temp(self):
-        return self.__get_item_max("temp_water_set")
+        return self.get_item_max("temp_water_set")
 
     @property
     def water_temp(self):
-        return self.__get_item_value("temp_water_get")
+        return self.get_item_value("temp_water_get")
 
     # Backwards compatibility
     water_temperature = water_temp
 
     @property
     def set_water_temp(self):
-        return self.__get_item_value("temp_water_set")
+        return self.get_item_value("temp_water_set")
 
     @set_water_temp.setter
     def set_water_temp(self, value):
-        self.__set_item_value("temp_water_set", value)
+        self.set_item_value("temp_water_set", value)
 
     # Backwards compatibility
     set_water_temperature = set_water_temp
 
     @property
     def gas_temp(self):
-        gas_temp = self.__get_item_value("temp_gas_flue_get")
+        gas_temp = self.get_item_value("temp_gas_flue_get")
         if gas_temp is None:
-            gas_temp = self.__get_item_value("temp_probe_k_get")
+            gas_temp = self.get_item_value("temp_probe_k_get")
         return gas_temp
 
     # Backwards compatibility
@@ -758,63 +743,66 @@ class Device(object):
 
     @property
     def natural_mode(self):
-        return self.__get_item_boolean("natural_mode_manual_set")
+        return self.get_item_boolean("natural_mode_manual_set")
 
     @natural_mode.setter
     def natural_mode(self, value):
-        self.__set_item_boolean("natural_mode_manual_set", value)
+        self.set_item_boolean("natural_mode_manual_set", value)
 
     @property
     def energy_saving_air_start(self):
-        return self.__get_item_value("es_air_start_set")
+        return self.get_item_value("es_air_start_set")
 
     @energy_saving_air_start.setter
     def energy_saving_air_start(self, value):
-        self.__set_item_value("es_air_start_set", value)
+        self.set_item_value("es_air_start_set", value)
 
     @property
     def min_energy_saving_air_start(self):
-        return self.__get_item_min("es_air_start_set")
+        return self.get_item_min("es_air_start_set")
 
     @property
     def max_energy_saving_air_start(self):
-        return self.__get_item_max("es_air_start_set")
+        return self.get_item_max("es_air_start_set")
 
     @property
     def energy_saving_air_stop(self):
-        return self.__get_item_value("es_air_stop_set")
+        return self.get_item_value("es_air_stop_set")
 
     @property
     def min_energy_saving_air_stop(self):
-        return self.__get_item_min("es_air_stop_set")
+        return self.get_item_min("es_air_stop_set")
 
     @property
     def max_energy_saving_air_stop(self):
-        return self.__get_item_max("es_air_stop_set")
+        return self.get_item_max("es_air_stop_set")
 
     @energy_saving_air_stop.setter
     def energy_saving_air_stop(self, value):
-        self.__set_item_value("es_air_stop_set", value)
+        self.set_item_value("es_air_stop_set", value)
 
     @property
     def real_power(self):
-        return self.__get_item_value("real_power_get")
+        return self.get_item_value("real_power_get")
 
     @property
     def min_power(self):
-        return self.__get_item_min("power_set")
+        return self.get_item_min("power_set")
 
     @property
     def max_power(self):
-        return self.__get_item_max("power_set")
+        return self.get_item_max("power_set")
 
     @property
-    def set_power(self):
-        return self.__get_item_value("power_set")
+    def power(self):
+        return self.get_item_value("power_set")
 
-    @set_power.setter
-    def set_power(self, value):
-        self.__set_item_value("power_set", value)
+    @power.setter
+    def power(self, value):
+        self.set_item_value("power_set", value)
+
+    # Backwards compatibility
+    set_power = power
 
     def turn_off(self):
         item = "status_managed_get"
@@ -837,11 +825,70 @@ class Device(object):
         data_map = {}
         for key, value in self.__register_map_dict.items():
             value["raw_value"] = self.__information_dict[value["offset"]]
-            value["calculated_value"] = self.__get_item_value(key)
-            value["formatted_value"] = self.__get_item_value(key, True)
+            value["calculated_value"] = self.get_item_value(key)
+            value["formatted_value"] = self.get_item_value(key, True)
             data_map[key] = value
 
         return data_map
+
+
+class Canalization(object):
+    MODE_MANUAL = 0
+    MODE_SEMI_AUTO = 1
+    MODE_AUTO = 2
+
+    def __init__(
+        self,
+        name,
+        device,
+    ):
+        self.__agua_iot = agua_iot
+        self.__device = device
+        self.name = name
+
+    @property
+    def min_air_temp(self):
+        return self.__device.get_item_min(f"{self.name}_temp_air_set")
+
+    @property
+    def max_air_temp(self):
+        return self.__device.get_item_max(f"{self.name}_temp_air_set")
+
+    @property
+    def air_temp(self):
+        return self.__device.get_item_value(f"{self.name}_temp_air_get")
+
+    @property
+    def set_air_temp(self):
+        return self.__device.get_item_value(f"{self.name}_temp_air_set")
+
+    @set_air_temp.setter
+    def set_air_temp(self, value):
+        self.__device.set_item_value(f"{self.name}_temp_air_set", value)
+
+    @property
+    def min_fan_speed(self):
+        return self.__device.get_item_min(f"{self.name}_vent_set")
+
+    @property
+    def max_fan_speed(self):
+        return self.__device.get_item_max(f"{self.name}_vent_set")
+
+    @property
+    def fan_speed(self):
+        return self.__device.get_item_value(f"{self.name}_vent_set")
+
+    @fan_speed.setter
+    def fan_speed(self, value):
+        self.__device.set_item_value(f"{self.name}_vent_set", value)
+
+    @property
+    def mode(self):
+        return self.__device.get_item_value(f"{self.name}_set")
+
+    @mode.setter
+    def mode(self, value):
+        self.__device.set_item_value(f"{self.name}_set", value)
 
 
 class Error(Exception):
