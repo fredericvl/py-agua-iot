@@ -30,7 +30,7 @@ API_PATH_DEVICE_REGISTERS_MAP = "/deviceGetRegistersMap"
 API_PATH_DEVICE_BUFFER_READING = "/deviceGetBufferReading"
 API_PATH_DEVICE_JOB_STATUS = "/deviceJobStatus/"
 API_PATH_DEVICE_WRITING = "/deviceRequestWriting"
-API_LOGIN_APPLICATION_VERSION = "1.6.0"
+API_LOGIN_APPLICATION_VERSION = "1.9.5"
 DEFAULT_TIMEOUT_VALUE = 5
 
 HEADER_ACCEPT = "application/json, text/javascript, */*; q=0.01"
@@ -205,6 +205,8 @@ class agua_iot(object):
             extra_login_headers = {
                 "applicationversion": self.api_login_application_version,
                 "url": API_PATH_LOGIN.lstrip("/"),
+                "userid": "null",
+                "aguaid": "null",
             }
             headers.update(extra_login_headers)
             url = self.login_api_url
